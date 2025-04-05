@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View, SafeAreaView } from "react-native";
 import ProjectScreen from "../tabs/projects.js";
 import ProfileScreen from "../tabs/profile.js";
 import HomeScreen from "../tabs/home.js";
@@ -12,16 +12,18 @@ const Navigator = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: {
-          fontFamily: "Semi-Bold",
-          height: 125,
+          fontFamily: "Lill-Lill",
+          height: 110,
           display: "flex",
           alignContent: "center",
           justifyContent: "center",
+          backgroundColor: "rgba(255, 255, 255, 0.89)",
         },
         headerTitleStyle: {
-          fontFamily: "Semi_bold", // Set your desired font family here
+          fontFamily: "Condensed-Regular",
           fontSize: 24, // Change the font size
-          color: "#333", // Change the text color
+          color: "black", // Change the text color
+          textTransform: "uppercase", // This makes the text uppercase
         },
       }}
     >
@@ -31,7 +33,7 @@ const Navigator = () => {
         options={{
           tabBarIcon: ({ focused }) => {
             const imageSource = focused
-              ? require("../assets/home-svgrepo-com (1).png")
+              ? require("../assets/home-svgrepo-(1).png")
               : require("../assets/home-svgrepo-com.png");
             return (
               <View
@@ -73,19 +75,21 @@ const Navigator = () => {
         name={"New Project"}
         component={NewScreen}
         options={{
-          tabBarIcon: ({ focused }) => (
-            <View
-              style={[
-                styles.iconContainer,
-                focused ? styles.focusedView : null,
-              ]}
-            >
-              <Image
-                style={styles.navIcon}
-                source={require("../assets/plus-square-on-square-svgrepo-com.png")}
-              />
-            </View>
-          ),
+          tabBarIcon: ({ focused }) => {
+            const imageSource = focused
+              ? require("../assets/plus-square-fill-on-square-fill-svgrepo-com.png") // Focused state image
+              : require("../assets/plus-square-on-square-svgrepo-com.png"); // Default image
+            return (
+              <View
+                style={[
+                  styles.iconContainer,
+                  focused ? styles.focusedView : null,
+                ]}
+              >
+                <Image style={styles.navIcon} source={imageSource} />
+              </View>
+            );
+          },
           tabBarShowLabel: false,
         }}
       />
@@ -115,7 +119,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 45,
-    marginTop: 70,
+    marginTop: 40,
     width: 50, // Explicit width for the icon container
     height: 50, // Explicit height for the icon container
   },

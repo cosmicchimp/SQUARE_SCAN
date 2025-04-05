@@ -6,9 +6,10 @@ import { useFonts } from "expo-font";
 import Header from "./components/header";
 export default function App() {
   const [fontsLoaded] = useFonts({
-    "Quicksand-Regular": require("./assets/fonts/Quicksand-Regular.ttf"),
+    "Quicksand-Regular": require("./assets/fonts/LilitaOne-Regular.ttf"),
     "Condensed-Regular": require("./assets/fonts/RobotoCondensed-Regular.ttf"),
     "Semi-Bold": require("./assets/fonts/RobotoCondensed-SemiBold.ttf"),
+    "Lill-Lill": require("./assets/fonts/LilitaOne-Regular.ttf"),
   });
 
   if (!fontsLoaded) {
