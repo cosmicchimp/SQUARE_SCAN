@@ -14,7 +14,7 @@ export default function home() {
   );
 }
 const styles = StyleSheet.create({
-  body: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.78)" },
+  body: { flex: 1, backgroundColor: "rgb(0, 0, 0)" },
   title: {
     fontFamily: "Semi-Bold",
     fontSize: 30,

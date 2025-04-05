@@ -27,6 +27,6 @@ const styles = StyleSheet.create({
   body: {
     flexDirection: "column",
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.78)",
+    backgroundColor: "rgb(0, 0, 0)",
   },
 });
