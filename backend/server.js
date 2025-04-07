@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 require("dotenv").config(); // Load environment variables
-
+const port = process.env.PORT || 4000;
 const { neon } = require("@neondatabase/serverless");
 
 const sql = neon(process.env.DATABASE_URL);
@@ -31,7 +31,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Start the Express server
-app.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+app.listen(port, () => {
+  console.log("Server running on port");
 });
