@@ -33,6 +33,13 @@ export default function LoginScreen() {
   function handleSignUpForm() {
     submitForm();
   }
+  const handleLogin = async (user, pass) => {
+    const loginPush = await fetch("https://square-scan.onrender.com/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: username, password: password }),
+    });
+  };
   //Sign up data
   const [signupEmail, updateSignupEmail] = useState("");
   const [signupPass, updateSignupPass] = useState("");
@@ -136,7 +143,12 @@ export default function LoginScreen() {
         />
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          handleLogin();
+        }}
+      >
         <Text style={styles.text}>Log in</Text>
       </TouchableOpacity>
 
@@ -155,7 +167,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   button: {
-    backgroundColor: "rgb(1,1,1)",
+    backgroundColor: "rgb(0, 0, 0)",
     borderRadius: 5,
     width: 100,
     padding: 8,
