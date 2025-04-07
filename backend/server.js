@@ -3,9 +3,10 @@ const app = express();
 require("dotenv").config(); // Load environment variables
 const port = process.env.PORT || 4000;
 const { neon } = require("@neondatabase/serverless");
-
 const sql = neon(process.env.DATABASE_URL);
-
+const cors = require("cors");
+app.use(express.json());
+app.use(cors());
 // Function to initialize the database (create the table)
 async function initializeDatabase() {
   try {
@@ -33,4 +34,8 @@ app.get("/", async (req, res) => {
 
 app.listen(port, () => {
   console.log("Server running on port");
+});
+
+app.post("/", (req, res) => {
+  console.log(req.body);
 });
