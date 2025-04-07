@@ -8,19 +8,19 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 // Function to initialize the database (create the table)
-async function initializeDatabase() {
-  try {
-    const pulledData = await sql`
-  SELECT * FROM userbase.users;`;
-    console.log("Data pulled: ", pulledData);
-  } catch (error) {
-    console.error("Error pulling data: ", error);
-  }
-}
-
+// async function initializeDatabase() {
+//   try {
+//     const pulledData = await sql`
+//   SELECT * FROM userbase.users;`;
+//     console.log("Data pulled: ", pulledData);
+//   } catch (error) {
+//     console.error("Error pulling data: ", error);
+//   }
+// }
 // Initialize the database
-initializeDatabase();
+// initializeDatabase();
 
+const checkUser = async (user, pass) => {};
 // Basic route for testing
 app.get("/", async (req, res) => {
   try {
@@ -37,5 +37,5 @@ app.listen(port, "0.0.0.0", () => {
 });
 
 app.post("/", (req, res) => {
-  console.log(req.body);
+  const { email, password } = req.body;
 });
