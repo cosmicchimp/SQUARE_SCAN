@@ -1,0 +1,37 @@
+const express = require("express");
+const app = express();
+require("dotenv").config(); // Load environment variables
+
+const { neon } = require("@neondatabase/serverless");
+
+const sql = neon(process.env.DATABASE_URL);
+
+// Function to initialize the database (create the table)
+async function initializeDatabase() {
+  try {
+    const pulledData = await sql`
+  SELECT * FROM userbase.users;`;
+    console.log("Data pulled: ", pulledData);
+  } catch (error) {
+    console.error("Error pulling data: ", error);
+  }
+}
+
+// Initialize the database
+initializeDatabase();
+
+// Basic route for testing
+app.get("/", async (req, res) => {
+  try {
+    const result = await sql`SELECT version()`;
+    const { version } = result[0];
+    res.status(200).send(`PostgreSQL Version: ${version}`);
+  } catch (error) {
+    res.status(500).send("Error fetching database version.");
+  }
+});
+
+// Start the Express server
+app.listen(3000, () => {
+  console.log("Server running at http://localhost:3000");
+});
