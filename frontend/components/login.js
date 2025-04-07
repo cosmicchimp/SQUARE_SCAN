@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import Logo from "../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function LoginScreen() {
   const [username, updateUsername] = useState("");
@@ -26,9 +27,42 @@ export default function LoginScreen() {
     }).start();
   }, [signupVisible]);
 
-  function handleSignUp() {
+  function handleSignUpBtn() {
     updateSignupVisible(true);
   }
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("localhost:3000", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ signupEmail, signupPass }),
+      });
+
+      if (response.ok) {
+        Alert.alert("Success", "Form submitted successfully!");
+        updateSignupEmail("");
+        updateSignupPass("");
+        updateVerifyPass("");
+      } else {
+        const errorData = await response.json();
+        Alert.alert(
+          "Error",
+          `Failed to submit form: ${
+            errorData.message || "Something went wrong"
+          }`
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      Alert.alert("Error", "Failed to connect to the server.");
+    }
+  };
+  const [signupEmail, updateSignupEmail] = useState("");
+  const [signupPass, updateSignupPass] = useState("");
+  const [verifyPass, updateVerifyPass] = useState("");
+  const [signupPhone, updateSignupPhone] = useState("");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,13 +92,48 @@ export default function LoginScreen() {
           },
         ]}
       >
+        <View style={styles.signupHeader}>
+          <TouchableOpacity
+            onPress={() => {
+              updateSignupVisible(false);
+            }}
+          >
+            <AntDesign name="close" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text style={styles.signupTitle}>Create an account</Text>
+        </View>
+        <View style={styles.signupForm}></View>
+        <TextInput
+          value={signupEmail}
+          onChangeText={updateSignupEmail}
+          placeholder="Email"
+          style={styles.input}
+        />
+        <TextInput
+          value={signupPass}
+          onChangeText={updateSignupPass}
+          placeholder="Password"
+          style={styles.input}
+          secureTextEntry={true}
+        />
+        <TextInput
+          value={verifyPass}
+          onChangeText={updateVerifyPass}
+          placeholder="Verify password"
+          style={styles.input}
+          secureTextEntry={true}
+        />
+        <Text style={styles.passInfo}>
+          A password requires 9+ characters, one number, and one symbol
+        </Text>
         <TouchableOpacity
-          style={styles.button}
+          style={styles.nextButton}
           onPress={() => {
             updateSignupVisible(false);
           }}
         >
-          <Text style={styles.text}>Exit</Text>
+          <Text style={styles.text}>Create Account</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -72,7 +141,7 @@ export default function LoginScreen() {
         <TextInput
           value={username}
           onChangeText={updateUsername}
-          placeholder="Username"
+          placeholder="Email"
           style={styles.input}
         />
         <TextInput
@@ -90,7 +159,7 @@ export default function LoginScreen() {
 
       <Text style={styles.signupText}>Don't have an account?</Text>
 
-      <TouchableOpacity style={styles.signupBtn} onPress={handleSignUp}>
+      <TouchableOpacity style={styles.signupBtn} onPress={handleSignUpBtn}>
         <Text style={[styles.signupText, styles.textBtn]}>Sign up</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -137,6 +206,7 @@ const styles = StyleSheet.create({
     width: "80%",
     padding: 10,
     marginBottom: 15,
+    alignSelf: "center",
   },
   signupBtn: {
     alignSelf: "center",
@@ -165,5 +235,39 @@ const styles = StyleSheet.create({
     backgroundColor: "white", // Background color for the modal content
     borderRadius: 10,
     zIndex: 1001, // Make sure modal is on top of the background
+  },
+  signupTitle: {
+    fontWeight: 600,
+    alignSelf: "center",
+    marginBottom: 10,
+    fontSize: 20,
+    marginLeft: 30,
+    marginBottom: 30,
+  },
+  passInfo: {
+    color: "black",
+    alignSelf: "center",
+  },
+  signupForm: {
+    gap: 10,
+  },
+  buttonBox: {
+    alignContent: "center",
+    flexDirection: "row",
+    gap: 20,
+    justifyContent: "center",
+  },
+  signupHeader: {
+    flexDirection: "row",
+    alignContent: "center",
+  },
+  nextButton: {
+    backgroundColor: "rgb(1,1,1)",
+    borderRadius: 5,
+    width: 200,
+    padding: 8,
+    alignSelf: "center",
+    marginBottom: 30,
+    marginTop: 20,
   },
 });
