@@ -30,40 +30,23 @@ export default function LoginScreen() {
   function handleSignUpBtn() {
     updateSignupVisible(true);
   }
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch("localhost:3000", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ signupEmail, signupPass }),
-      });
-
-      if (response.ok) {
-        Alert.alert("Success", "Form submitted successfully!");
-        updateSignupEmail("");
-        updateSignupPass("");
-        updateVerifyPass("");
-      } else {
-        const errorData = await response.json();
-        Alert.alert(
-          "Error",
-          `Failed to submit form: ${
-            errorData.message || "Something went wrong"
-          }`
-        );
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      Alert.alert("Error", "Failed to connect to the server.");
-    }
-  };
+  function handleSignUpForm() {
+    submitForm();
+  }
+  //Sign up data
   const [signupEmail, updateSignupEmail] = useState("");
   const [signupPass, updateSignupPass] = useState("");
   const [verifyPass, updateVerifyPass] = useState("");
   const [signupPhone, updateSignupPhone] = useState("");
-
+  const submitForm = async () => {
+    const dataPush = await fetch("https://square-scan.onrender.com/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: signupEmail, password: signupPass }),
+    });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
@@ -130,7 +113,7 @@ export default function LoginScreen() {
         <TouchableOpacity
           style={styles.nextButton}
           onPress={() => {
-            updateSignupVisible(false);
+            handleSignUpForm();
           }}
         >
           <Text style={styles.text}>Create Account</Text>
