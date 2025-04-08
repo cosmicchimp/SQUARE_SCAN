@@ -23,7 +23,7 @@ app.use(cors());
 const checkUser = async (user, pass) => {
   const validity =
     await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
-  if ((validity.length = 1)) {
+  if (validity.length === 1) {
     return true;
   } else {
     return false;
@@ -51,5 +51,7 @@ app.post("/login", (req, res) => {
   );
   if (checkUser(email, password)) {
     console.log(`User '${email}' is logged in!`);
+  } else {
+    console.log("Log in denied");
   }
 });
