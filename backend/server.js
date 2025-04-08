@@ -38,4 +38,5 @@ app.listen(port, "0.0.0.0", () => {
 
 app.post("/", (req, res) => {
   const { email, password } = req.body;
+  console.log(`User (${email} attemped to log in using password (${password})`);
 });
