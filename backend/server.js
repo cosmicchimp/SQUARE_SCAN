@@ -46,12 +46,13 @@ app.listen(port, "0.0.0.0", () => {
   console.log("Server running on port" + port);
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   console.log(
     `User (${email}) attemped to log in using password (${password})`
   );
-  if (checkUser(email, password)) {
+  const isValid = await checkUser(email, password);
+  if (isValid) {
     console.log(`User '${email}' is logged in!`);
   } else {
     console.log("Log in denied");
