@@ -24,6 +24,11 @@ const checkUser = async (user, pass) => {
   const validity =
     await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
   console.log(validity);
+  if ((validity.length = 1)) {
+    return true;
+  } else {
+    return false;
+  }
 };
 // Basic route for testing
 app.get("/", async (req, res) => {
