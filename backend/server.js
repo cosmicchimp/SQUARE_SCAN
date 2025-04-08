@@ -21,15 +21,16 @@ app.use(cors());
 // initializeDatabase();
 
 const checkUser = async (user, pass) => {
-  const validity =
-    await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
-  console.log(validity);
-  if (validity[0] !== undefined) {
-    return true;
-  } else {
+  try {
+    const result =
+      await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
+    return result.length > 0; // <-- only returns true if a match is found
+  } catch (err) {
+    console.error("Database error during checkUser:", err);
     return false;
   }
 };
+
 // Basic route for testing
 app.get("/", async (req, res) => {
   try {
