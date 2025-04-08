@@ -20,7 +20,11 @@ app.use(cors());
 // Initialize the database
 // initializeDatabase();
 
-const checkUser = async (user, pass) => {};
+const checkUser = async (user, pass) => {
+  const validity =
+    await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
+  console.log(validity);
+};
 // Basic route for testing
 app.get("/", async (req, res) => {
   try {
@@ -41,4 +45,5 @@ app.post("/login", (req, res) => {
   console.log(
     `User (${email}) attemped to log in using password (${password})`
   );
+  checkUser(email, password);
 });
