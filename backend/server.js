@@ -23,7 +23,6 @@ app.use(cors());
 const checkUser = async (user, pass) => {
   const validity =
     await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
-  console.log(validity);
   if ((validity.length = 1)) {
     return true;
   } else {
@@ -50,5 +49,7 @@ app.post("/login", (req, res) => {
   console.log(
     `User (${email}) attemped to log in using password (${password})`
   );
-  checkUser(email, password);
+  if (checkUser(email, password)) {
+    console.log(`User '${email}' is logged in!`);
+  }
 });
