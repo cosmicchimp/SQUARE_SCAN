@@ -23,7 +23,7 @@ app.use(cors());
 const checkUser = async (user, pass) => {
   const validity =
     await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
-  if (result.rows.length > 0) {
+  if (validity.rows.length > 0) {
     return true;
   } else {
     return false;
