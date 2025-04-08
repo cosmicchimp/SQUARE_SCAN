@@ -34,7 +34,7 @@ export default function LoginScreen() {
     submitForm();
   }
   const handleLogin = async (user, pass) => {
-    const loginPush = await fetch("https://square-scan.onrender.com/", {
+    const loginPush = await fetch("https://square-scan.onrender.com/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: username, password: password }),
