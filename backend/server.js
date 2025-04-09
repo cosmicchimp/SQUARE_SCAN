@@ -54,7 +54,9 @@ app.post("/login", async (req, res) => {
   const isValid = await checkUser(email, password);
   if (isValid) {
     console.log(`User '${email}' is logged in!`);
+    res.json({ success: true, message: "Login successful" });
   } else {
     console.log("Log in denied");
+    res.json({ success: false, message: "Login failed" });
   }
 });
