@@ -1,10 +1,8 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet } from "react-native";
-import { NavigationContainer } from "@react-navigation/native"; // FIX: Correct import
-import Navigator from "./navigation/tabs";
 import { useFonts } from "expo-font";
-import Header from "./components/header";
-import Login from "./components/login";
+import RootNavigator from "./navigation/RootNavigator";
+import { AuthProvider } from "./context/AuthContext";
+import { useContext } from "react";
 export default function App() {
   const [fontsLoaded] = useFonts({
     "Quicksand-Regular": require("./assets/fonts/LilitaOne-Regular.ttf"),
@@ -17,11 +15,9 @@ export default function App() {
     return null; // Or splash screen / loader
   }
   return (
-    <Login />
-    // <NavigationContainer>
-    //   <Navigator />
-    //   <StatusBar style="auto" />
-    // </NavigationContainer>
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
   );
 }
 

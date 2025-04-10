@@ -15,9 +15,9 @@ const Navigator = () => {
           fontFamily: "Lill-Lill",
           height: 110,
           display: "flex",
-          alignContent: "center",
-          justifyContent: "center",
+          flexDirection: "row",
           backgroundColor: "rgba(255, 255, 255, 0.89)",
+          alignItems: "center",
         },
         headerTitleStyle: {
           fontFamily: "Condensed-Regular",
@@ -124,15 +124,15 @@ const styles = StyleSheet.create({
     height: 50, // Explicit height for the icon container
   },
   navIcon: {
-    maxWidth: 40,
+    width: 40,
+    height: 40,
     resizeMode: "contain",
-    marginTop: 70,
     opacity: 0.8,
   },
   profileIcon: {
-    maxWidth: 35,
+    width: 35,
+    height: 35,
     resizeMode: "contain",
-    marginTop: 70,
     opacity: 0.8,
   },
 });

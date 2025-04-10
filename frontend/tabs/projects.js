@@ -5,9 +5,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Animated,
 } from "react-native";
-
-// Image paths
+import { useState, useRef } from "react";
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+  FontAwesome,
+  FontAwesome6,
+  Entypo,
+  Feather,
+} from "@expo/vector-icons";
+// Image paths (same as before)
 const images = [
   require("../assets/Images/1fc38c94ba4f4ef18ecf32fb1b563127-cc_ft_960.jpg"),
   require("../assets/Images/84ff675c45cd1765cf0c6c8a1b592c32l-m558761304od-w640_h480.jpg"),
@@ -19,7 +28,7 @@ const images = [
   require("../assets/Images/ff3b8b6e2b47570abfac34b80df9ef0d-cc_ft_960.jpg"),
 ];
 
-// Fake data for projects
+// Fake data for projects (same as before)
 const fakeData = [
   {
     id: 1,
@@ -68,34 +77,56 @@ const fakeData = [
     name: "123 Riverstone Ave",
     cover: images[6],
     date: new Date("2023-04"),
-
     images: ["19.png", "20.png", "21.png"],
   },
 ];
 
 export default function Projects() {
-  const filter = /^20\d{2}$/;
+  const slide = useRef(new Animated.Value(500)).current;
+  const [visible, setVisible] = useState(false);
+
+  const toggleSlide = () => {
+    Animated.timing(slide, {
+      toValue: visible ? 500 : 0, // Slide out if visible, slide in if hidden
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    setVisible(!visible);
+  };
+
   return (
     <View style={styles.body}>
+      <Animated.View
+        style={[{ transform: [{ translateX: slide }] }, styles.popupModal]}
+      >
+        {/* Modal content */}
+        <Text style={{ color: "white", padding: 10 }}>
+          This is a popup modal
+        </Text>
+        <TouchableOpacity
+          onPress={toggleSlide} // Call toggleSlide here
+          style={styles.exitButton}
+        >
+          <Text style={styles.exitText}>Exit</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
       <FlatList
         data={fakeData}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.listBox}>
+          <TouchableOpacity style={styles.listBox} onPress={toggleSlide}>
             <Image source={item.cover} style={styles.coverImage} />
             <View style={styles.textBox}>
               <Text style={styles.text}>{item.name}</Text>
-              <Text style={styles.text}>
-                {item.date.toString().slice(0, 16)}
+              <Text style={styles.date}>
+                <Text>Date: {item.date.toString().slice(0, 16)}</Text>
               </Text>
-
               <TouchableOpacity style={styles.doneButton}>
                 <Text style={styles.buttonText}>Done</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Uncomment to show the cover image */}
           </TouchableOpacity>
         )}
       />
@@ -107,28 +138,38 @@ const styles = StyleSheet.create({
   list: {
     alignSelf: "center",
     width: "95%",
-    gap: 8,
-    marginTop: 10,
+    gap: 60,
+    marginTop: 20,
   },
   listBox: {
-    paddingTop: 40,
-    paddingBottom: 40,
+    paddingTop: 30,
+    paddingBottom: 30,
     paddingLeft: 20,
     borderRadius: 5,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 20,
+    borderWidth: 1,
+    borderColor: "grey",
+    backgroundColor: "rgba(158, 158, 158, 0.15)",
   },
   text: {
     color: "white",
     fontFamily: "Condensed-Regular",
-    fontSize: 20,
+    fontSize: 17,
+    marginBottom: 10,
+  },
+  date: {
+    color: "white",
+    fontFamily: "Condensed-Regular",
+    fontSize: 15,
+    marginBottom: 10,
   },
   coverImage: {
     width: "100%",
-    height: 85,
-    width: 85,
+    height: 95,
+    width: 95,
     borderRadius: 5,
     marginTop: 10,
   },
@@ -137,17 +178,31 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(1, 1, 1)",
   },
   textBox: {
-    gap: 5,
+    gap: 0,
+    alignContent: "center",
+    justifyContent: "center",
   },
   doneButton: {
     backgroundColor: "rgba(24, 255, 16, 0.73)",
     borderRadius: 10,
-    width: 50,
-    padding: 5,
+    width: 70,
+    padding: 11,
   },
   buttonText: {
     alignSelf: "center",
     color: "white",
     fontFamily: "Condensed-Regular",
+  },
+  popupModal: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: "100%",
+    zIndex: 1000,
+    backgroundColor: "black",
+  },
+  exitButton: {
+    backgroundColor: "white",
   },
 });

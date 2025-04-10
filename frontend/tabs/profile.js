@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   View,
   Text,
@@ -15,8 +15,9 @@ import {
   Entypo,
   Feather,
 } from "@expo/vector-icons";
-
+import { AuthContext } from "../context/AuthContext";
 export default function Profile() {
+  const { AuthenticateUser } = useContext(AuthContext);
   const [visible, setVisible] = useState(false);
   const modalValue = useRef(new Animated.Value(1000)).current;
 
@@ -31,7 +32,9 @@ export default function Profile() {
   const handleButtonPress = () => {
     setVisible(true);
   };
-
+  const handleLogOut = () => {
+    AuthenticateUser(false);
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
       {/* Modal */}
@@ -95,7 +98,12 @@ export default function Profile() {
         </View>
 
         <View style={styles.section}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              handleLogOut();
+            }}
+          >
             <Text style={styles.text}>Log out</Text>
             <FontAwesome6 name="door-open" size={24} color="white" />
           </TouchableOpacity>

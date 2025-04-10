@@ -8,16 +8,16 @@ import {
   Text,
   Animated,
 } from "react-native";
-import { useState, useEffect, useRef } from "react";
-import Logo from "../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg";
+import { useState, useContext, useEffect, useRef } from "react";
+import Logo from "../../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
+import { AuthContext } from "../../context/AuthContext";
 export default function LoginScreen() {
   const [username, updateUsername] = useState("");
   const [password, updatePassword] = useState("");
   const [signupVisible, updateSignupVisible] = useState(false);
   const slideValue = useRef(new Animated.Value(1000)).current;
-
+  const { AuthenticateUser, isAuthenticated } = useContext(AuthContext);
   // Trigger the slide animation when signupVisible changes
   useEffect(() => {
     Animated.timing(slideValue, {
@@ -33,12 +33,20 @@ export default function LoginScreen() {
   function handleSignUpForm() {
     submitForm();
   }
-  const handleLogin = async (user, pass) => {
+  const handleLogin = async () => {
     const loginPush = await fetch("https://square-scan.onrender.com/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: username, password: password }),
     });
+    const loginResponse = await loginPush.json();
+    if (loginResponse.success == false) {
+      alert("Log in failed");
+    } else if (loginResponse.success == true) {
+      AuthenticateUser(true);
+    } else {
+      alert("Error occurred while attempting to log in");
+    }
   };
   //Sign up data
   const [signupEmail, updateSignupEmail] = useState("");
@@ -46,20 +54,26 @@ export default function LoginScreen() {
   const [verifyPass, updateVerifyPass] = useState("");
   const [signupPhone, updateSignupPhone] = useState("");
   const submitForm = async () => {
-    const dataPush = await fetch("https://square-scan.onrender.com/", {
+    const dataPush = await fetch("https://square-scan.onrender.com/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email: signupEmail, password: signupPass }),
     });
+    const { success, message } = await dataPush.json();
+    if (success) {
+      alert(message);
+      updateSignupVisible(false);
+    } else {
+      alert(message);
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Image style={styles.logo} source={Logo} />
       </View>
-
       {/* Modal with a transparent background to show behind content */}
       {signupVisible && (
         <Animated.View

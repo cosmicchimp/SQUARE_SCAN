@@ -5,8 +5,10 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Animated,
 } from "react-native";
-export default function newProject() {
+import { useState, useRef, useEffect } from "react";
+export default function NewProject() {
   return (
     <View style={styles.body}>
       <TouchableOpacity
