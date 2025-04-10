@@ -30,8 +30,15 @@ const checkUser = async (user, pass) => {
       return false; // No user found
     }
     console.log("Stored hash:", result[0].password, "password:", pass);
-    const cryptCheck = await bcrypt.compare(pass, result[0].password); // Use result[0] to access the first user
-    console.log("CryptCheck:", cryptCheck);
+    const cryptCheck = await bcrypt.compare(
+      pass.trim(),
+      result[0].password.trim()
+    ); // Use result[0] to access the first user
+    const cryptCheck2 = await bcrypt.compare(
+      "poop",
+      "$2b$10$7di1j1nQbos7fVqqs0HsL.ORpG7XWw8vlBtYAocEIbamy.8saknum"
+    );
+    console.log("CryptCheck:", cryptCheck, cryptCheck2);
   } catch (err) {
     console.error("Database error during checkUser:", err);
     return false;
