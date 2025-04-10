@@ -24,7 +24,8 @@ app.use(cors());
 
 const checkUser = async (user, pass) => {
   try {
-    const result = await sql`SELECT * FROM userbase.users WHERE email = ${user}`;
+    const result =
+      await sql`SELECT * FROM userbase.users WHERE email = ${user}`;
     if (result.length === 0) {
       return false; // No user found
     }
@@ -79,10 +80,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
-  const signup = await signUpUser(email, password);
-  };
+  const signup = await signUpUser(email, password); // Now this will work as expected
+
   if (signup) {
     res.json({
       success: true,
