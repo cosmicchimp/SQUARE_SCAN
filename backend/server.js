@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const app = express();
 require("dotenv").config(); // Load environment variables
 const port = process.env.PORT || 4000;
@@ -7,6 +8,7 @@ const sql = neon(process.env.DATABASE_URL);
 const cors = require("cors");
 app.use(express.json());
 app.use(cors());
+
 // Function to initialize the database (create the table)
 // async function initializeDatabase() {
 //   try {
@@ -23,14 +25,28 @@ app.use(cors());
 const checkUser = async (user, pass) => {
   try {
     const result =
-      await sql`SELECT * FROM userbase.users WHERE email = ${user} AND password_hash = ${pass}`;
-    return result.length > 0; // <-- only returns true if a match is found
+      await sql`SELECT * FROM userbase.users WHERE email = ${user}`;
+    const cryptCheck = await bcrypt.compare(pass, result.password);
+    return cryptCheck; // <-- only returns true if a match is found
   } catch (err) {
     console.error("Database error during checkUser:", err);
     return false;
   }
 };
 
+const signUpUser = async (email, password) => {
+  const encryptedpass = bcrypt.hash(password, 10);
+  try {
+    const createUser = await sql`
+    INSERT INTO users(email, password, created_at) 
+    VALUES (${email}, ${encryptedpass}, NOW())
+  `;
+    return true;
+  } catch (e) {
+    console.log("Error: " + e);
+    return false;
+  }
+};
 // Basic route for testing
 app.get("/", async (req, res) => {
   try {
@@ -58,5 +74,23 @@ app.post("/login", async (req, res) => {
   } else {
     console.log("Log in denied");
     res.json({ success: false, message: "Login failed" });
+  }
+});
+
+app.post("/signup", (req, res) => {
+  const { email, password } = req.body;
+  const signup = () => {
+    signUpUser(email, password);
+  };
+  if (signup) {
+    res.json({
+      success: true,
+      message: "Account created successfully",
+    });
+  } else {
+    res.json({
+      success: false,
+      message: "Account creation failed",
+    });
   }
 });
