@@ -29,7 +29,9 @@ const checkUser = async (user, pass) => {
     if (result.length === 0) {
       return false; // No user found
     }
+    console.log("Stored hash:", result[0].password), "password:", pass;
     const cryptCheck = await bcrypt.compare(pass, result[0].password); // Use result[0] to access the first user
+
     return cryptCheck;
   } catch (err) {
     console.error("Database error during checkUser:", err);
@@ -44,6 +46,7 @@ const signUpUser = async (email, password) => {
       INSERT INTO userbase.users(email, password, created_at) 
       VALUES (${email}, ${encryptedpass}, NOW())
     `;
+    console.log("User created");
     return true; // Return a result indicating success
   } catch (e) {
     console.log("Error: " + e);
