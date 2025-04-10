@@ -24,10 +24,12 @@ app.use(cors());
 
 const checkUser = async (user, pass) => {
   try {
-    const result =
-      await sql`SELECT * FROM userbase.users WHERE email = ${user}`;
-    const cryptCheck = await bcrypt.compare(pass, result.password);
-    return cryptCheck; // <-- only returns true if a match is found
+    const result = await sql`SELECT * FROM userbase.users WHERE email = ${user}`;
+    if (result.length === 0) {
+      return false; // No user found
+    }
+    const cryptCheck = await bcrypt.compare(pass, result[0].password); // Use result[0] to access the first user
+    return cryptCheck;
   } catch (err) {
     console.error("Database error during checkUser:", err);
     return false;
@@ -35,7 +37,7 @@ const checkUser = async (user, pass) => {
 };
 
 const signUpUser = async (email, password) => {
-  const encryptedpass = bcrypt.hash(password, 10);
+  const encryptedpass = await bcrypt.hash(password, 10);
   try {
     const createUser = await sql`
     INSERT INTO users(email, password, created_at) 
@@ -79,8 +81,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/signup", (req, res) => {
   const { email, password } = req.body;
-  const signup = () => {
-    signUpUser(email, password);
+  const signup = await signUpUser(email, password);
   };
   if (signup) {
     res.json({
