@@ -41,7 +41,7 @@ const signUpUser = async (email, password) => {
   try {
     const encryptedpass = await bcrypt.hash(password, 10); // Make sure to await bcrypt.hash
     await sql`
-      INSERT INTO users(email, password, created_at) 
+      INSERT INTO userbase.users(email, password, created_at) 
       VALUES (${email}, ${encryptedpass}, NOW())
     `;
     return true; // Return a result indicating success
