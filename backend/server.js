@@ -34,11 +34,7 @@ const checkUser = async (user, pass) => {
       pass.trim(),
       result[0].password.trim()
     ); // Use result[0] to access the first user
-    const cryptCheck2 = await bcrypt.compare(
-      "poop",
-      "$2b$10$7di1j1nQbos7fVqqs0HsL.ORpG7XWw8vlBtYAocEIbamy.8saknum"
-    );
-    console.log("CryptCheck:", cryptCheck, cryptCheck2);
+    return cryptCheck;
   } catch (err) {
     console.error("Database error during checkUser:", err);
     return false;
