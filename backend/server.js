@@ -31,8 +31,7 @@ const checkUser = async (user, pass) => {
     }
     console.log("Stored hash:", result[0].password, "password:", pass);
     const cryptCheck = await bcrypt.compare(pass, result[0].password); // Use result[0] to access the first user
-
-    return cryptCheck;
+    console.log("CryptCheck:", cryptCheck);
   } catch (err) {
     console.error("Database error during checkUser:", err);
     return false;
