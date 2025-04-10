@@ -37,16 +37,16 @@ const checkUser = async (user, pass) => {
 };
 
 const signUpUser = async (email, password) => {
-  const encryptedpass = await bcrypt.hash(password, 10);
   try {
-    const createUser = await sql`
-    INSERT INTO users(email, password, created_at) 
-    VALUES (${email}, ${encryptedpass}, NOW())
-  `;
-    return true;
+    const encryptedpass = await bcrypt.hash(password, 10); // Make sure to await bcrypt.hash
+    await sql`
+      INSERT INTO users(email, password, created_at) 
+      VALUES (${email}, ${encryptedpass}, NOW())
+    `;
+    return true; // Return a result indicating success
   } catch (e) {
     console.log("Error: " + e);
-    return false;
+    return false; // Return false in case of an error
   }
 };
 // Basic route for testing
