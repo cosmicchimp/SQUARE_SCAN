@@ -29,7 +29,7 @@ const checkUser = async (user, pass) => {
     if (result.length === 0) {
       return false; // No user found
     }
-    console.log("Stored hash:", result[0].password), "password:", pass;
+    console.log("Stored hash:", result[0].password, "password:", pass);
     const cryptCheck = await bcrypt.compare(pass, result[0].password); // Use result[0] to access the first user
 
     return cryptCheck;
