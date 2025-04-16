@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
   Animated,
 } from "react-native";
 import { useState, useRef } from "react";
@@ -17,6 +18,7 @@ import {
   Feather,
 } from "@expo/vector-icons";
 // Image paths (same as before)
+const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
 const images = [
   require("../assets/Images/1fc38c94ba4f4ef18ecf32fb1b563127-cc_ft_960.jpg"),
   require("../assets/Images/84ff675c45cd1765cf0c6c8a1b592c32l-m558761304od-w640_h480.jpg"),
@@ -84,8 +86,15 @@ const fakeData = [
 export default function Projects() {
   const slide = useRef(new Animated.Value(500)).current;
   const [visible, setVisible] = useState(false);
-
-  const toggleSlide = () => {
+  const [modalInfo, updateModalInfo] = useState({
+    name: null,
+    photo: null,
+  });
+  const toggleSlide = (name, photo) => {
+    updateModalInfo({
+      name,
+      photo,
+    });
     Animated.timing(slide, {
       toValue: visible ? 500 : 0, // Slide out if visible, slide in if hidden
       duration: 300,
@@ -99,16 +108,85 @@ export default function Projects() {
       <Animated.View
         style={[{ transform: [{ translateX: slide }] }, styles.popupModal]}
       >
-        {/* Modal content */}
-        <Text style={{ color: "white", padding: 10 }}>
-          This is a popup modal
-        </Text>
-        <TouchableOpacity
-          onPress={toggleSlide} // Call toggleSlide here
-          style={styles.exitButton}
-        >
-          <Text style={styles.exitText}>Exit</Text>
-        </TouchableOpacity>
+        <ScrollView>
+          {/* Modal content */}
+          <Text style={styles.modalTitle}>{modalInfo.name}</Text>
+          <View style={styles.photoModal}>
+            <View style={styles.topRow}>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Back-left corner</Text>
+              </View>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Back</Text>
+              </View>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Back-right corner</Text>
+              </View>
+            </View>
+
+            <View style={styles.middleRow}>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Left side</Text>
+              </View>
+
+              <TouchableOpacity style={styles.photoModalButton}>
+                <Image source={logo} style={styles.photoModalButton} />
+              </TouchableOpacity>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Right side</Text>
+              </View>
+            </View>
+
+            <View style={styles.bottomRow}>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Front-left corner</Text>
+              </View>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Front</Text>
+              </View>
+              <View style={styles.photoButtonBox}>
+                <TouchableOpacity
+                  style={styles.photoModalButton}
+                ></TouchableOpacity>
+                <Text style={styles.buttonText}>Front-right corner</Text>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            onPress={() => {
+              toggleSlide(null, null);
+            }} // Call toggleSlide here
+            style={styles.exitButton}
+          >
+            <Text style={styles.exitText}>Exit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.exitButton}>
+            <Text style={styles.exitText}>Measurements</Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
 
       <FlatList
@@ -116,7 +194,12 @@ export default function Projects() {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.listBox} onPress={toggleSlide}>
+          <TouchableOpacity
+            style={styles.listBox}
+            onPress={() => {
+              toggleSlide(item.name, item.cover);
+            }}
+          >
             <Image source={item.cover} style={styles.coverImage} />
             <View style={styles.textBox}>
               <Text style={styles.text}>{item.name}</Text>
@@ -201,8 +284,65 @@ const styles = StyleSheet.create({
     height: "100%",
     zIndex: 1000,
     backgroundColor: "black",
+    flexDirection: "column",
+    alignContent: "center",
+    justifyContent: "center",
+  },
+  modalTitle: {
+    color: "white",
+    padding: 10,
+    alignSelf: "center",
+    marginTop: "2%",
+    fontSize: 20,
+    fontWeight: 600,
+    borderBottomWidth: 2,
+    borderBottomColor: "white",
   },
   exitButton: {
     backgroundColor: "white",
+    width: "40%",
+    height: "60%",
+    borderRadius: 5,
+    padding: 10,
+    alignSelf: "center",
+    marginTop: "5%",
+    marginBottom: "5%",
+  },
+  exitText: {
+    alignSelf: "center",
+    fontSize: 18,
+    fontWeight: 800,
+  },
+  photoModal: {
+    width: "100%",
+    height: "40%",
+    alignSelf: "center",
+    alignContent: "center",
+    gap: "8%",
+    marginTop: "15%",
+  },
+  topRow: { flexDirection: "row", gap: "5%", alignSelf: "center" },
+  middleRow: {
+    flexDirection: "row",
+    gap: "5%",
+    alignSelf: "center",
+  },
+  bottomRow: { flexDirection: "row", gap: "5%", alignSelf: "center" },
+  buttonText: {
+    fontWeight: 800,
+    fontSize: 12,
+    color: "white",
+    alignSelf: "center",
+    marginTop: "4%",
+  },
+  photoModalButton: {
+    width: 110,
+    height: 110,
+    borderRadius: 8,
+    backgroundColor: "white",
+  },
+  bottomButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
