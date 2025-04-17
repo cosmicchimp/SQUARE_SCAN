@@ -1,11 +1,15 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
+import express from "express";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import { neon } from "@neondatabase/serverless";
+import cors from "cors";
+
 const app = express();
-require("dotenv").config(); // Load environment variables
+dotenv.config();
+
 const port = process.env.PORT || 4000;
-const { neon } = require("@neondatabase/serverless");
 const sql = neon(process.env.DATABASE_URL);
-const cors = require("cors");
+
 app.use(express.json());
 app.use(cors());
 
