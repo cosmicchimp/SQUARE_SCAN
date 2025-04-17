@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Animated,
+  Modal
 } from "react-native";
 import { useState, useRef } from "react";
 import {
@@ -17,7 +18,11 @@ import {
   Entypo,
   Feather,
 } from "@expo/vector-icons";
+
 import PopupModal from "../components/Modal";
+import CameraNode from "../components/CameraNode";
+import { BlurView } from 'expo-blur';
+
 // Image paths (same as before)
 const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
 const images = [
@@ -85,12 +90,15 @@ const fakeData = [
 ];
 
 export default function Projects() {
+  const [showInfoModal, setShowInfoModal] = useState(false); // How to take images
   const slide = useRef(new Animated.Value(500)).current;
   const [visible, setVisible] = useState(false);
   const [modalInfo, updateModalInfo] = useState({
     name: null,
     photo: null,
   });
+
+
   const toggleSlide = (name, photo) => {
     updateModalInfo({
       name,
@@ -130,86 +138,89 @@ export default function Projects() {
       />
       <Animated.View
         style={[{ transform: [{ translateX: slide }] }, styles.popupModal]}
-      >
+      >          
+      
+        {/* Modal content */}
         <ScrollView>
-          {/* Modal content */}
+          {/* title */}
           <Text style={styles.modalTitle}>{modalInfo.name}</Text>
+          
+          {/* photo square */}
           <View style={styles.photoModal}>
+
+            {/* top row of photos */}
             <View style={styles.topRow}>
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={0} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Back-left corner</Text>
               </View>
+
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={1} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Back</Text>
               </View>
+
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={2} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Back-right corner</Text>
               </View>
             </View>
 
+            {/* middle row of photos with logo */}
             <View style={styles.middleRow}>
+
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={3} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Left side</Text>
               </View>
 
-              <TouchableOpacity style={styles.photoModalButton}>
+              {/* logo */}
+              <TouchableOpacity style={styles.photoModalButton} onPress={() => setShowInfoModal(true)}> 
                 <Image source={logo} style={styles.photoModalButton} />
               </TouchableOpacity>
+
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={4} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Right side</Text>
               </View>
             </View>
 
             <View style={styles.bottomRow}>
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={5} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Front-left corner</Text>
               </View>
+
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
-                <Text style={styles.buttonText}>Front</Text>
+                <CameraNode index={6} styleButton={styles.photoModalButton} />
+                <Text style={styles.buttonText}>Front</Text> 
               </View>
+
               <View style={styles.photoButtonBox}>
-                <TouchableOpacity
-                  style={styles.photoModalButton}
-                ></TouchableOpacity>
+                <CameraNode index={7} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Front-right corner</Text>
               </View>
             </View>
+
           </View>
         </ScrollView>
+
+        {/* Bottom buttons */}
         <View style={styles.bottomButtons}>
-          <TouchableOpacity
-            onPress={() => {
-              toggleSlide(null, null);
-            }} // Call toggleSlide here
-            style={styles.exitButton}
-          >
-            <Text style={styles.exitText}>Exit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.exitButton}>
-            <Text style={styles.exitText}>Measurements</Text>
-          </TouchableOpacity>
+
+          <BlurView intensity={80} tint="light" style={styles.exitButton}>
+            <TouchableOpacity onPress={() => {toggleSlide(null, null);}}  >
+              <Text style={styles.exitText}>Exit</Text>
+            </TouchableOpacity>
+          </BlurView>
+
+          <BlurView intensity={80} tint="light" style={styles.exitButton}>
+            <TouchableOpacity >
+              <Text style={styles.exitText}>Measurements</Text>
+            </TouchableOpacity>
+          </BlurView>
         </View>
+
       </Animated.View>
 
       <FlatList
@@ -237,7 +248,24 @@ export default function Projects() {
           </TouchableOpacity>
         )}
       />
+
+      <Modal visible={showInfoModal} transparent={true}>
+        <View style={{flex:1, backgroundColor:"#055"}}>
+          
+          {/* bottom buttons */}
+          <View style ={{flex:1, justifyContent:"flex-end", top:2}}>
+            <View style={styles.buttonBox}>  
+              <TouchableOpacity onPress={() => setShowInfoModal(false)} style={styles.closeButton}>
+                <Text style={styles.closeText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
+
+    
   );
 }
 
@@ -265,7 +293,7 @@ const styles = StyleSheet.create({
   listBox: {
     paddingTop: 30,
     paddingBottom: 30,
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     borderRadius: 5,
     display: "flex",
     flexDirection: "row",
@@ -352,21 +380,24 @@ const styles = StyleSheet.create({
     borderBottomColor: "white",
   },
   exitButton: {
-    backgroundColor: "white",
-    width: "40%",
-    height: "60%",
-    borderRadius: 5,
+    backgroundColor: "rgba(255,255,255,0.5)",
+    width: "45%",
+    height: "55%",
+    borderRadius: 15,
     padding: 10,
     alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
+    overflow: "hidden",
     marginTop: "5%",
     marginBottom: "5%",
     borderWidth: 2,
-    borderColor: "rgb(30, 167, 202)",
   },
   exitText: {
     alignSelf: "center",
     fontSize: 18,
     fontWeight: 800,
+    color: "white",
   },
   photoModal: {
     width: "100%",
@@ -393,13 +424,39 @@ const styles = StyleSheet.create({
   photoModalButton: {
     width: 110,
     height: 110,
-    borderRadius: 8,
-    backgroundColor: "white",
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,1)",
     borderWidth: 2,
-    borderColor: "rgb(30, 167, 202)",
+    
+    justifyContent:"center",
+    alignItems:"center",
   },
   bottomButtons: {
     flexDirection: "row",
+    height: "15%",
     justifyContent: "space-around",
+    
   },
+  closeButton: {
+    padding: 10,
+    height: 50,
+    backgroundColor: '#131313',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeText: {
+    color: 'white',
+    fontSize: 19,
+    
+  },
+  buttonBox: {    
+    height:"15%",
+    flexDirection:"row",
+    alignItems: 'flex-start',
+    justifyContent:"space-between", 
+    width:"100%", 
+    backgroundColor:"#131313",
+    padding:15
+  }
 });
