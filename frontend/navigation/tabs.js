@@ -71,28 +71,7 @@ const Navigator = () => {
           tabBarShowLabel: false,
         }}
       />
-      <Tab.Screen
-        name={"New Project"}
-        component={NewScreen}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            const imageSource = focused
-              ? require("../assets/plus-square-fill-on-square-fill-svgrepo-com.png") // Focused state image
-              : require("../assets/plus-square-on-square-svgrepo-com.png"); // Default image
-            return (
-              <View
-                style={[
-                  styles.iconContainer,
-                  focused ? styles.focusedView : null,
-                ]}
-              >
-                <Image style={styles.navIcon} source={imageSource} />
-              </View>
-            );
-          },
-          tabBarShowLabel: false,
-        }}
-      />
+
       <Tab.Screen
         name={"Profile"}
         component={ProfileScreen}

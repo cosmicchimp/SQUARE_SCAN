@@ -17,6 +17,7 @@ import {
   Entypo,
   Feather,
 } from "@expo/vector-icons";
+import PopupModal from "../components/Modal";
 // Image paths (same as before)
 const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
 const images = [
@@ -102,9 +103,31 @@ export default function Projects() {
     }).start();
     setVisible(!visible);
   };
-
+  const [isVisible, updateVisible] = useState(false);
+  const [projectName, updateProjectName] = useState("");
+  const newProjectBox = () => {
+    return (
+      <TouchableOpacity
+        style={styles.newProjectBox}
+        onPress={() => {
+          updateVisible(true);
+        }}
+      >
+        <View style={styles.topTextBox}>
+          <Text style={styles.bigText}>+</Text>
+          <Text style={styles.headerText}>Create A New Project</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   return (
     <View style={styles.body}>
+      <PopupModal
+        isVisible={isVisible}
+        updateVisible={updateVisible}
+        projectName={projectName}
+        updateProjectName={updateProjectName}
+      />
       <Animated.View
         style={[{ transform: [{ translateX: slide }] }, styles.popupModal]}
       >
@@ -191,6 +214,7 @@ export default function Projects() {
 
       <FlatList
         data={fakeData}
+        ListHeaderComponent={newProjectBox}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
@@ -221,8 +245,22 @@ const styles = StyleSheet.create({
   list: {
     alignSelf: "center",
     width: "95%",
-    gap: 60,
+    gap: 40,
     marginTop: 20,
+  },
+  newProjectBox: {
+    paddingTop: 30,
+    marginTop: "5%",
+    paddingBottom: 30,
+    paddingLeft: 20,
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    borderWidth: 1,
+    borderColor: "grey",
+    backgroundColor: "rgba(158, 158, 158, 0.15)",
   },
   listBox: {
     paddingTop: 30,
@@ -243,6 +281,21 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginBottom: 10,
   },
+  headerText: {
+    color: "white",
+    fontFamily: "Condensed-Regular",
+    fontSize: 30,
+    marginTop: "3%",
+    alignSelf: "center",
+    marginRight: "4%",
+  },
+  topTextBox: {
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "space-around",
+    width: "100%",
+  },
+  bigText: { fontSize: 90, color: "white", alignSelf: "center" },
   date: {
     color: "white",
     fontFamily: "Condensed-Regular",
@@ -307,6 +360,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: "5%",
     marginBottom: "5%",
+    borderWidth: 2,
+    borderColor: "rgb(30, 167, 202)",
   },
   exitText: {
     alignSelf: "center",
@@ -340,6 +395,8 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 8,
     backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "rgb(30, 167, 202)",
   },
   bottomButtons: {
     flexDirection: "row",

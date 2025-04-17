@@ -11,9 +11,9 @@ import {
   MaterialIcons,
   MaterialCommunityIcons,
   FontAwesome,
-  FontAwesome6,
   Entypo,
   Feather,
+  FontAwesome6,
 } from "@expo/vector-icons";
 import { AuthContext } from "../context/AuthContext";
 export default function Profile() {
@@ -54,7 +54,7 @@ export default function Profile() {
 
       {/* Settings List */}
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.section}>
+        <View style={[styles.section, { marginTop: "8%" }]}>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.text}>Account info</Text>
             <MaterialIcons name="account-circle" size={24} color="white" />
@@ -73,10 +73,9 @@ export default function Profile() {
             <Text style={styles.text}>Language</Text>
             <FontAwesome name="language" size={24} color="white" />
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Write a review</Text>
-            <MaterialIcons name="reviews" size={24} color="white" />
+            <Text style={styles.text}>Payment</Text>
+            <FontAwesome6 name="money-check-dollar" size={24} color="white" />
           </TouchableOpacity>
         </View>
 
@@ -85,7 +84,10 @@ export default function Profile() {
             <Text style={styles.text}>Support</Text>
             <Entypo name="phone" size={24} color="white" />
           </TouchableOpacity>
-
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.text}>Write a review</Text>
+            <MaterialIcons name="reviews" size={24} color="white" />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.text}>Clear data</Text>
             <Feather name="trash-2" size={24} color="white" />
