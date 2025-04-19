@@ -112,9 +112,8 @@ app.post("/projectpull", async (req, res) => {
     const query =
       await sql`SELECT * FROM userbase.projects WHERE creator_id = ${userid}`;
     console.log(query);
-    const projects = query.rows;
-    console.log("projects: ", projects);
-    res.json({ projects });
+    console.log("projects: ", query);
+    res.json({ query: query });
   } catch (e) {
     console.log("error: ", e);
   }
