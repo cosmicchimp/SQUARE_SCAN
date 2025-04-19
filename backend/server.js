@@ -110,7 +110,7 @@ app.post("/projectpull", async (req, res) => {
   try {
     const { userid } = req.body;
     const projects =
-      await sql`SELECT * FROM projects WHERE creator_id = ${userid}`;
+      await sql`SELECT * FROM userbase.projects WHERE creator_id = ${userid}`;
     console.log(projects);
     res.json({ projects }); // ✅ Send projects back
   } catch (e) {
