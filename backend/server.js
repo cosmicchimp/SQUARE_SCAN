@@ -105,3 +105,16 @@ app.post("/signup", async (req, res) => {
     });
   }
 });
+
+app.post("/projectpull", async (req, res) => {
+  try {
+    const { userid } = req.body;
+    const projects =
+      await sql`SELECT * FROM projects WHERE creator_id = ${userid}`;
+    console.log(projects);
+    res.json({ projects }); // ✅ Send projects back
+  } catch (e) {
+    console.log("error: ", e);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
