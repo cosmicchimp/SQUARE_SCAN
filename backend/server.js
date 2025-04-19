@@ -111,10 +111,24 @@ app.post("/projectpull", async (req, res) => {
     const { userid } = req.body;
     const query =
       await sql`SELECT * FROM userbase.projects WHERE creator_id = ${userid}`;
-    console.log(query);
-    console.log("projects: ", query);
     res.json({ query: query });
   } catch (e) {
     console.log("error: ", e);
+  }
+});
+
+app.post("/projectpush", async (req, res) => {
+  try {
+    const { project_name, creator_id, address } = req.body;
+    const creation =
+      await sql`INSERT INTO userbase.projects(project_name, creator_id, date) VALUES (${project_name}, ${creator_id}, NOW())`;
+    if (creation) {
+      res.json({ message: "Created!" });
+    } else {
+      res.json({ message: "Creation failed" });
+    }
+  } catch (e) {
+    console.log("error: ", e);
+    res.status(500).json({ message: "Server error", error: e.message });
   }
 });
