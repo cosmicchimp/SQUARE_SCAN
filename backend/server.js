@@ -121,6 +121,7 @@ app.post("/projectpush", async (req, res) => {
   try {
     const { project_name, creator_id, address } = req.body;
     await sql`INSERT INTO userbase.projects(project_name, creator_id, created_at) VALUES (${project_name}, ${creator_id}, NOW())`;
+    res.status(201).json({ message: "Project created successfully!" });
   } catch (e) {
     console.log("error: ", e);
     res.status(500).json({ message: "Server error", error: e.message });
