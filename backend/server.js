@@ -13,19 +13,6 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(express.json());
 app.use(cors());
 
-// Function to initialize the database (create the table)
-// async function initializeDatabase() {
-//   try {
-//     const pulledData = await sql`
-//   SELECT * FROM userbase.users;`;
-//     console.log("Data pulled: ", pulledData);
-//   } catch (error) {
-//     console.error("Error pulling data: ", error);
-//   }
-// }
-// Initialize the database
-// initializeDatabase();
-
 const checkUser = async (user, pass) => {
   try {
     const result =
