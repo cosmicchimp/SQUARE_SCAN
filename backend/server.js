@@ -108,9 +108,9 @@ app.post("/signup", async (req, res) => {
 
 app.post("/projectpull", async (req, res) => {
   try {
-    const { userid } = req.body;
+    const { user_email } = req.body;
     const query =
-      await sql`SELECT * FROM userbase.projects WHERE creator_id = ${userid}`;
+      await sql`SELECT * FROM userbase.projects WHERE creator_id = (SELECT user_id FROM userbase.users WHERE users.email = ${user_email})`;
     res.json({ query: query });
   } catch (e) {
     console.log("error: ", e);
@@ -121,7 +121,7 @@ app.post("/projectpush", async (req, res) => {
   try {
     const { project_name, creator_id, address } = req.body;
     console.log("Received body:", req.body);
-    await sql`INSERT INTO userbase.projects(project_name, creator_id, created_at) VALUES (${project_name},  ${creator_id}, NOW())`;
+    await sql`INSERT INTO userbase.projects(project_name, creator_id, created_at) VALUES (${project_name},  (SELECT user_id FROM userbase.users WHERE users.email = ${creator_id}), NOW())`;
     res.status(201).json({ message: "Project created successfully!" });
   } catch (e) {
     console.log("error: ", e);
