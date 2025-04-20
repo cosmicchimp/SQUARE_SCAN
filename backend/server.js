@@ -122,11 +122,12 @@ app.post("/projectpush", async (req, res) => {
   VALUES (${project_name}, ${user.user_id}, NOW())
   RETURNING project_id
 `;
-
+    const projectid = project.project_id;
+    console.log("project id: ", projectid);
     // Step 3: Use the new project_id in a related insert
     await sql`
   INSERT INTO userbase.addresses (project_address_id, address)
-  VALUES (${project.project_id}, ${address})
+  VALUES (${projectid}, ${address})
 `;
     res.status(201).json({ message: "Project created successfully!" });
   } catch (e) {
