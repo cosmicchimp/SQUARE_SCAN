@@ -121,9 +121,9 @@ app.post("/projectpush", async (req, res) => {
   INSERT INTO userbase.projects (project_name, creator_id, created_at, cover_image)
   VALUES (${project_name}, ${
       user.user_id
-    }, NOW(), https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${
+    }, NOW(), ${`https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${encodeURIComponent(
       address || "The Statue of Liberty"
-    }&key=${process.env.GOOGLE_STATIC_KEY}
+    )}&key=${process.env.GOOGLE_STATIC_KEY}`}
 )
   RETURNING project_id
 `;
