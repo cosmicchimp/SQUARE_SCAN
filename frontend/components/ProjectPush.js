@@ -20,7 +20,7 @@ export default async ({
     );
     const returnmessage = await datapush.json();
     console.log("Message from server: ", returnmessage.message);
-    updateDataStatus("Updated");
+    updateDataStatus(returnmessage);
   } catch (e) {
     console.log("Error: ", e);
   }

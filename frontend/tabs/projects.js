@@ -198,7 +198,14 @@ export default function Projects() {
               toggleSlide(item.project_name, item.image_links);
             }}
           >
-            <Text style={styles.text}>{item.project_name}</Text>
+            <Image
+              source={{ uri: item.cover_photo }}
+              style={styles.coverImage}
+            />
+            <View style={styles.textBox}>
+              <Text style={styles.text}>{item.project_name}</Text>
+              <Text style={styles.text}>{item.created_at.slice(0, 10)}</Text>
+            </View>
           </TouchableOpacity>
         )}
       />
@@ -256,6 +263,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "grey",
     backgroundColor: "rgba(158, 158, 158, 0.15)",
+  },
+  textBox: {
+    flexDirection: "column",
   },
   text: {
     color: "white",

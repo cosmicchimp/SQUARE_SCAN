@@ -10,6 +10,7 @@ const ProjectPull = async ({ currentUser }) => {
       }
     );
     const query = await projectFetch.json();
+    console.log("Query data:", query);
     return query;
   } catch (e) {
     console.log("Error: ", e);
