@@ -118,8 +118,13 @@ app.post("/projectpush", async (req, res) => {
 
     // Step 2: Insert into projects using the retrieved user_id
     const [project] = await sql`
-  INSERT INTO userbase.projects (project_name, creator_id, created_at)
-  VALUES (${project_name}, ${user.user_id}, NOW())
+  INSERT INTO userbase.projects (project_name, creator_id, created_at, cover_image)
+  VALUES (${project_name}, ${
+      user.user_id
+    }, NOW(), https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${
+      address || "The Statue of Liberty"
+    }&key=${process.env.GOOGLE_STATIC_KEY}
+)
   RETURNING project_id
 `;
     const projectid = project.project_id;
