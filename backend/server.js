@@ -97,8 +97,8 @@ app.post("/projectpull", async (req, res) => {
   try {
     const { user_email } = req.body;
     const query =
-      await sql`SELECT * FROM userbase.projects WHERE creator_id = (SELECT user_id FROM userbase.users WHERE users.email = ${user_email})`;
-    res.json({ query: query });
+      await sql`SELECT * FROM userbase.projects INNER JOIN addresses ON projects.project_id = addresses.project_id WHERE projects.creator_id = (SELECT user_id FROM userbase.users WHERE users.email = ${user_email})`;
+    const project_id = res.json({ query: query });
   } catch (e) {
     console.log("error: ", e);
   }
