@@ -15,6 +15,11 @@ export default function NewProject({
   updateVisible,
   projectName,
   updateProjectName,
+  projectPush,
+  projectAddress,
+  updateProjectAddress,
+  currentUser,
+  updateDataStatus,
 }) {
   const slideValue = useRef(new Animated.Value(1000)).current;
   //  Timing animation for the modal
@@ -70,16 +75,22 @@ export default function NewProject({
               placeholder="Address"
               placeholderTextColor="rgba(1, 1, 1, 0.76)"
               onChangeText={(val) => {
-                updateAddress(val);
+                updateProjectAddress(val);
               }}
-              value={projectName}
+              value={projectAddress}
             />
           </View>
           <View style={styles.buttonBox}>
             <TouchableOpacity
               style={styles.exitButton}
               onPress={() => {
-                slideDown();
+                projectPush({
+                  project_name: projectName,
+                  creator_email: currentUser,
+                  address: projectAddress,
+                  updateDataStatus: updateDataStatus,
+                }),
+                  slideDown();
               }}
             >
               <Text style={styles.text}>Create</Text>

@@ -17,7 +17,8 @@ export default function LoginScreen() {
   const [password, updatePassword] = useState("");
   const [signupVisible, updateSignupVisible] = useState(false);
   const slideValue = useRef(new Animated.Value(1000)).current;
-  const { AuthenticateUser, isAuthenticated } = useContext(AuthContext);
+  const { AuthenticateUser, isAuthenticated, setCurrentUser } =
+    useContext(AuthContext);
   // Trigger the slide animation when signupVisible changes
   useEffect(() => {
     Animated.timing(slideValue, {
@@ -44,6 +45,7 @@ export default function LoginScreen() {
       alert("Log in failed");
     } else if (loginResponse.success == true) {
       AuthenticateUser(true);
+      setCurrentUser(username);
     } else {
       alert("Error occurred while attempting to log in");
     }

@@ -6,7 +6,8 @@ import AppStack from "./AppStack";
 import { AuthContext } from "../context/AuthContext";
 const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
-  const { isAuthenticated, AuthenticateUser } = useContext(AuthContext);
+  const { isAuthenticated, AuthenticateUser, currentUser, setCurrentUser } =
+    useContext(AuthContext);
   return (
     <NavigationContainer>
       {isAuthenticated ? <AppStack /> : <AuthStack />}

@@ -4,10 +4,13 @@ import ProjectScreen from "../tabs/projects.js";
 import ProfileScreen from "../tabs/profile.js";
 import HomeScreen from "../tabs/home.js";
 import NewScreen from "../tabs/new.js";
-
+import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
 const Tab = createBottomTabNavigator();
 
 const Navigator = () => {
+  const { isAuthenticated, AuthenticateUser, currentUser, setCurrentUser } =
+    useContext(AuthContext);
   return (
     <Tab.Navigator
       screenOptions={{
@@ -30,6 +33,7 @@ const Navigator = () => {
       <Tab.Screen
         name={"Home"}
         component={HomeScreen}
+        initialParams={{ currentUser }}
         options={{
           tabBarIcon: ({ focused }) => {
             const imageSource = focused
@@ -51,6 +55,7 @@ const Navigator = () => {
       />
       <Tab.Screen
         name={"Projects"}
+        initialParams={{ currentUser }}
         component={ProjectScreen}
         options={{
           tabBarIcon: ({ focused }) => {
@@ -75,6 +80,7 @@ const Navigator = () => {
       <Tab.Screen
         name={"Profile"}
         component={ProfileScreen}
+        initialParams={{ currentUser }}
         options={{
           tabBarIcon: ({ focused }) => {
             const imageSource = focused

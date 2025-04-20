@@ -7,9 +7,8 @@ import {
   Image,
   ScrollView,
   Animated,
-  Modal
+  Modal,
 } from "react-native";
-import { useState, useRef } from "react";
 import {
   MaterialIcons,
   MaterialCommunityIcons,
@@ -21,75 +20,34 @@ import {
 
 import PopupModal from "../components/Modal";
 import CameraNode from "../components/CameraNode";
-import { BlurView } from 'expo-blur';
-
+import { BlurView } from "expo-blur";
+import { useEffect, useState, useRef, useContext } from "react";
+import ProjectPull from "../components/ProjectPull";
+import projectPush from "../components/ProjectPush";
+import { AuthContext } from "../context/AuthContext";
 // Image paths (same as before)
 const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
-const images = [
-  require("../assets/Images/1fc38c94ba4f4ef18ecf32fb1b563127-cc_ft_960.jpg"),
-  require("../assets/Images/84ff675c45cd1765cf0c6c8a1b592c32l-m558761304od-w640_h480.jpg"),
-  require("../assets/Images/181b9491befb092027e83972e235eb9d-cc_ft_960.jpg"),
-  require("../assets/Images/813cb345f2a1b0e1059f504b16cad6b6-p_c.jpg"),
-  require("../assets/Images/208704c108bd441421707daca3fb7c0el-m2667743328rd-w480_h360.jpg"),
-  require("../assets/Images/15469242030d45ce0e3eb326d57c7d2c-cc_ft_960.jpg"),
-  require("../assets/Images/dae5414579884909689318d5567abb1ca5cc1582-15-medium.webp"),
-  require("../assets/Images/ff3b8b6e2b47570abfac34b80df9ef0d-cc_ft_960.jpg"),
-];
 
-// Fake data for projects (same as before)
-const fakeData = [
-  {
-    id: 1,
-    name: "118 Wintermist Drive",
-    cover: images[0],
-    date: new Date("2023-04-04"),
-    images: ["1.png", "2.png", "3.png"],
-  },
-  {
-    id: 2,
-    name: "45 Maple Lane",
-    cover: images[1],
-    date: new Date("2023-04-04"),
-    images: ["4.png", "5.png", "6.png"],
-  },
-  {
-    id: 3,
-    name: "789 Oakwood Blvd",
-    cover: images[2],
-    date: new Date("2023-04-04"),
-    images: ["7.png", "8.png", "9.png"],
-  },
-  {
-    id: 4,
-    name: "232 Pinehill Road",
-    cover: images[3],
-    date: new Date("2023-04-04"),
-    images: ["10.png", "11.png", "12.png"],
-  },
-  {
-    id: 5,
-    name: "101 Sunset Boulevard",
-    cover: images[4],
-    date: new Date("2023-04-04"),
-    images: ["13.png", "14.png", "15.png"],
-  },
-  {
-    id: 6,
-    name: "560 Eaglecrest Drive",
-    cover: images[5],
-    date: new Date("2023-04-04"),
-    images: ["16.png", "17.png", "18.png"],
-  },
-  {
-    id: 7,
-    name: "123 Riverstone Ave",
-    cover: images[6],
-    date: new Date("2023-04"),
-    images: ["19.png", "20.png", "21.png"],
-  },
-];
-
+//
+//This is the default export project component
 export default function Projects() {
+  const { currentUser } = useContext(AuthContext);
+  console.log("Current user: ", currentUser);
+  const [userProjects, updateProjects] = useState();
+  const [dataStatus, updateDataStatus] = useState();
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const result = await ProjectPull({ currentUser: currentUser });
+        updateProjects(result.query);
+      } catch (error) {
+        console.error("Error in useEffect:", error);
+      }
+    };
+    fetchProjects();
+  }, [dataStatus]);
+
+  console.log(userProjects);
   const [showInfoModal, setShowInfoModal] = useState(false); // How to take images
   const slide = useRef(new Animated.Value(500)).current;
   const [visible, setVisible] = useState(false);
@@ -97,7 +55,6 @@ export default function Projects() {
     name: null,
     photo: null,
   });
-
 
   const toggleSlide = (name, photo) => {
     updateModalInfo({
@@ -113,6 +70,7 @@ export default function Projects() {
   };
   const [isVisible, updateVisible] = useState(false);
   const [projectName, updateProjectName] = useState("");
+  const [projectAddress, updateProjectAddress] = useState("");
   const newProjectBox = () => {
     return (
       <TouchableOpacity
@@ -134,20 +92,23 @@ export default function Projects() {
         isVisible={isVisible}
         updateVisible={updateVisible}
         projectName={projectName}
+        projectAddress={projectAddress}
+        updateProjectAddress={updateProjectAddress}
         updateProjectName={updateProjectName}
+        projectPush={projectPush}
+        currentUser={currentUser}
+        updateDataStatus={updateDataStatus}
       />
       <Animated.View
         style={[{ transform: [{ translateX: slide }] }, styles.popupModal]}
-      >          
-      
+      >
         {/* Modal content */}
         <ScrollView>
           {/* title */}
           <Text style={styles.modalTitle}>{modalInfo.name}</Text>
-          
+
           {/* photo square */}
           <View style={styles.photoModal}>
-
             {/* top row of photos */}
             <View style={styles.topRow}>
               <View style={styles.photoButtonBox}>
@@ -168,14 +129,16 @@ export default function Projects() {
 
             {/* middle row of photos with logo */}
             <View style={styles.middleRow}>
-
               <View style={styles.photoButtonBox}>
                 <CameraNode index={3} styleButton={styles.photoModalButton} />
                 <Text style={styles.buttonText}>Left side</Text>
               </View>
 
               {/* logo */}
-              <TouchableOpacity style={styles.photoModalButton} onPress={() => setShowInfoModal(true)}> 
+              <TouchableOpacity
+                style={styles.photoModalButton}
+                onPress={() => setShowInfoModal(true)}
+              >
                 <Image source={logo} style={styles.photoModalButton} />
               </TouchableOpacity>
 
@@ -193,7 +156,7 @@ export default function Projects() {
 
               <View style={styles.photoButtonBox}>
                 <CameraNode index={6} styleButton={styles.photoModalButton} />
-                <Text style={styles.buttonText}>Front</Text> 
+                <Text style={styles.buttonText}>Front</Text>
               </View>
 
               <View style={styles.photoButtonBox}>
@@ -201,71 +164,61 @@ export default function Projects() {
                 <Text style={styles.buttonText}>Front-right corner</Text>
               </View>
             </View>
-
           </View>
         </ScrollView>
 
         {/* Bottom buttons */}
         <View style={styles.bottomButtons}>
-
           <BlurView intensity={80} tint="light" style={styles.exitButton}>
-            <TouchableOpacity onPress={() => {toggleSlide(null, null);}}  >
+            <TouchableOpacity
+              onPress={() => {
+                toggleSlide(null, null);
+              }}
+            >
               <Text style={styles.exitText}>Exit</Text>
             </TouchableOpacity>
           </BlurView>
 
           <BlurView intensity={80} tint="light" style={styles.exitButton}>
-            <TouchableOpacity >
+            <TouchableOpacity>
               <Text style={styles.exitText}>Measurements</Text>
             </TouchableOpacity>
           </BlurView>
         </View>
-
       </Animated.View>
 
       <FlatList
-        data={fakeData}
+        data={userProjects}
         ListHeaderComponent={newProjectBox}
-        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.listBox}
             onPress={() => {
-              toggleSlide(item.name, item.cover);
+              toggleSlide(item.project_name, item.image_links);
             }}
           >
-            <Image source={item.cover} style={styles.coverImage} />
-            <View style={styles.textBox}>
-              <Text style={styles.text}>{item.name}</Text>
-              <Text style={styles.date}>
-                <Text>Date: {item.date.toString().slice(0, 16)}</Text>
-              </Text>
-              <TouchableOpacity style={styles.doneButton}>
-                <Text style={styles.buttonText}>Done</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.text}>{item.project_name}</Text>
           </TouchableOpacity>
         )}
       />
 
       <Modal visible={showInfoModal} transparent={true}>
-        <View style={{flex:1, backgroundColor:"#055"}}>
-          
+        <View style={{ flex: 1, backgroundColor: "#055" }}>
           {/* bottom buttons */}
-          <View style ={{flex:1, justifyContent:"flex-end", top:2}}>
-            <View style={styles.buttonBox}>  
-              <TouchableOpacity onPress={() => setShowInfoModal(false)} style={styles.closeButton}>
+          <View style={{ flex: 1, justifyContent: "flex-end", top: 2 }}>
+            <View style={styles.buttonBox}>
+              <TouchableOpacity
+                onPress={() => setShowInfoModal(false)}
+                style={styles.closeButton}
+              >
                 <Text style={styles.closeText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-
     </View>
-
-    
   );
 }
 
@@ -275,6 +228,7 @@ const styles = StyleSheet.create({
     width: "95%",
     gap: 40,
     marginTop: 20,
+    paddingBottom: "20%",
   },
   newProjectBox: {
     paddingTop: 30,
@@ -427,36 +381,34 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,1)",
     borderWidth: 2,
-    
-    justifyContent:"center",
-    alignItems:"center",
+
+    justifyContent: "center",
+    alignItems: "center",
   },
   bottomButtons: {
     flexDirection: "row",
     height: "15%",
     justifyContent: "space-around",
-    
   },
   closeButton: {
     padding: 10,
     height: 50,
-    backgroundColor: '#131313',
+    backgroundColor: "#131313",
     borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   closeText: {
-    color: 'white',
+    color: "white",
     fontSize: 19,
-    
   },
-  buttonBox: {    
-    height:"15%",
-    flexDirection:"row",
-    alignItems: 'flex-start',
-    justifyContent:"space-between", 
-    width:"100%", 
-    backgroundColor:"#131313",
-    padding:15
-  }
+  buttonBox: {
+    height: "15%",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "100%",
+    backgroundColor: "#131313",
+    padding: 15,
+  },
 });
