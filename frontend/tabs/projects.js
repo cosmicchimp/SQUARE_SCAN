@@ -5,19 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
   ScrollView,
   Animated,
   Modal,
 } from "react-native";
-import {
-  MaterialIcons,
-  MaterialCommunityIcons,
-  FontAwesome,
-  FontAwesome6,
-  Entypo,
-  Feather,
-} from "@expo/vector-icons";
-
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import PopupModal from "../components/Modal";
 import CameraNode from "../components/CameraNode";
 import { BlurView } from "expo-blur";
@@ -25,16 +18,41 @@ import { useEffect, useState, useRef, useContext } from "react";
 import ProjectPull from "../components/ProjectPull";
 import projectPush from "../components/ProjectPush";
 import { AuthContext } from "../context/AuthContext";
+import InfoModal from "../components/InfoModal";
 // Image paths (same as before)
 const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
-
 //
 //This is the default export project component
 export default function Projects() {
+  //All context state and effect definitions
   const { currentUser } = useContext(AuthContext);
-  console.log("Current user: ", currentUser);
   const [userProjects, updateProjects] = useState();
   const [dataStatus, updateDataStatus] = useState();
+  const [incompleteScan, updateScanStatus] = useState(true);
+  const slide = useRef(new Animated.Value(500)).current;
+  const [visible, setVisible] = useState(false);
+  const [modalInfo, updateModalInfo] = useState({
+    name: null,
+    photo: null,
+  });
+  const [isVisible, updateVisible] = useState(false);
+  const [isInfoVisible, setInfoVisible] = useState(false);
+  const [projectName, updateProjectName] = useState("");
+  const [projectAddress, updateProjectAddress] = useState("");
+  //Start of function tools
+  const toggleSlide = (name, photo) => {
+    updateModalInfo({
+      name,
+      photo,
+    });
+
+    Animated.timing(slide, {
+      toValue: visible ? 500 : 0, // Slide out if visible, slide in if hidden
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    setVisible(!visible);
+  };
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -46,46 +64,27 @@ export default function Projects() {
     };
     fetchProjects();
   }, [dataStatus]);
-
-  console.log(userProjects);
-  const [showInfoModal, setShowInfoModal] = useState(false); // How to take images
-  const slide = useRef(new Animated.Value(500)).current;
-  const [visible, setVisible] = useState(false);
-  const [modalInfo, updateModalInfo] = useState({
-    name: null,
-    photo: null,
-  });
-
-  const toggleSlide = (name, photo) => {
-    updateModalInfo({
-      name,
-      photo,
-    });
-    Animated.timing(slide, {
-      toValue: visible ? 500 : 0, // Slide out if visible, slide in if hidden
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-    setVisible(!visible);
-  };
-  const [isVisible, updateVisible] = useState(false);
-  const [projectName, updateProjectName] = useState("");
-  const [projectAddress, updateProjectAddress] = useState("");
   const newProjectBox = () => {
     return (
-      <TouchableOpacity
-        style={styles.newProjectBox}
-        onPress={() => {
-          updateVisible(true);
-        }}
-      >
-        <View style={styles.topTextBox}>
-          <Text style={styles.bigText}>+</Text>
-          <Text style={styles.headerText}>Create A New Project</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.newProjectBox}>
+        <TouchableOpacity
+          style={styles.topButton}
+          onPress={() => {
+            updateVisible(true);
+          }}
+        >
+          <Text style={styles.headerText}>New</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.topButton}>
+          <Text style={styles.headerText}>Drafts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.topButton}>
+          <Text style={styles.headerText}>Edit</Text>
+        </TouchableOpacity>
+      </View>
     );
   };
+  console.log("Current user: ", currentUser);
   return (
     <View style={styles.body}>
       <PopupModal
@@ -103,10 +102,21 @@ export default function Projects() {
         style={[{ transform: [{ translateX: slide }] }, styles.popupModal]}
       >
         {/* Modal content */}
+        <InfoModal
+          isInfoVisible={isInfoVisible}
+          setInfoVisible={setInfoVisible}
+        />
         <ScrollView>
           {/* title */}
           <Text style={styles.modalTitle}>{modalInfo.name}</Text>
-
+          <TouchableOpacity
+            style={styles.infoBar}
+            onPress={() => {
+              setInfoVisible(true);
+            }}
+          >
+            <FontAwesome6 name="question-circle" size={25} color="white" />
+          </TouchableOpacity>
           {/* photo square */}
           <View style={styles.photoModal}>
             {/* top row of photos */}
@@ -135,12 +145,6 @@ export default function Projects() {
               </View>
 
               {/* logo */}
-              <TouchableOpacity
-                style={styles.photoModalButton}
-                onPress={() => setShowInfoModal(true)}
-              >
-                <Image source={logo} style={styles.photoModalButton} />
-              </TouchableOpacity>
 
               <View style={styles.photoButtonBox}>
                 <CameraNode index={4} styleButton={styles.photoModalButton} />
@@ -172,7 +176,22 @@ export default function Projects() {
           <BlurView intensity={80} tint="light" style={styles.exitButton}>
             <TouchableOpacity
               onPress={() => {
-                toggleSlide(null, null);
+                Alert.alert(
+                  "Are you sure you want to leave?",
+                  "All unsaved data will be lost.",
+                  [
+                    {
+                      text: "No",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        toggleSlide();
+                      },
+                    },
+                  ]
+                );
               }}
             >
               <Text style={styles.exitText}>Exit</Text>
@@ -209,22 +228,6 @@ export default function Projects() {
           </TouchableOpacity>
         )}
       />
-
-      <Modal visible={showInfoModal} transparent={true}>
-        <View style={{ flex: 1, backgroundColor: "#055" }}>
-          {/* bottom buttons */}
-          <View style={{ flex: 1, justifyContent: "flex-end", top: 2 }}>
-            <View style={styles.buttonBox}>
-              <TouchableOpacity
-                onPress={() => setShowInfoModal(false)}
-                style={styles.closeButton}
-              >
-                <Text style={styles.closeText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -236,20 +239,22 @@ const styles = StyleSheet.create({
     gap: 40,
     marginTop: 20,
     paddingBottom: "20%",
+    backgroundColor: "#055",
   },
   newProjectBox: {
-    paddingTop: 30,
     marginTop: "5%",
-    paddingBottom: 30,
     paddingLeft: 20,
+    paddingTop: "8%",
+    paddingBottom: "8%",
     borderRadius: 5,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
+    gap: "20%",
     borderWidth: 1,
     borderColor: "grey",
-    backgroundColor: "rgba(158, 158, 158, 0.15)",
+    backgroundColor: "rgba(255, 255, 255, 0.84)",
+    justifyContent: "center",
   },
   listBox: {
     paddingTop: 30,
@@ -259,27 +264,26 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
+    gap: "10%",
     borderWidth: 1,
     borderColor: "grey",
-    backgroundColor: "rgba(158, 158, 158, 0.15)",
+    backgroundColor: "rgba(255, 255, 255, 0.84)",
   },
   textBox: {
     flexDirection: "column",
   },
   text: {
-    color: "white",
+    color: "black",
     fontFamily: "Condensed-Regular",
     fontSize: 17,
     marginBottom: 10,
   },
   headerText: {
-    color: "white",
+    color: "black",
     fontFamily: "Condensed-Regular",
-    fontSize: 30,
+    fontSize: 20,
     marginTop: "3%",
     alignSelf: "center",
-    marginRight: "4%",
   },
   topTextBox: {
     flexDirection: "row",
@@ -287,7 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "100%",
   },
-  bigText: { fontSize: 90, color: "white", alignSelf: "center" },
+  bigText: { fontSize: 60, color: "white", alignSelf: "center" },
   date: {
     color: "white",
     fontFamily: "Condensed-Regular",
@@ -303,7 +307,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    backgroundColor: "rgb(1, 1, 1)",
+    backgroundColor: "#055",
   },
   textBox: {
     gap: 0,
@@ -369,13 +373,19 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "center",
     gap: "8%",
-    marginTop: "15%",
+    marginTop: "8%",
+  },
+  infoBar: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    width: "93%",
   },
   topRow: { flexDirection: "row", gap: "5%", alignSelf: "center" },
   middleRow: {
     flexDirection: "row",
-    gap: "5%",
-    alignSelf: "center",
+    justifyContent: "space-between",
+    marginLeft: "5%",
+    marginRight: "5%",
   },
   bottomRow: { flexDirection: "row", gap: "5%", alignSelf: "center" },
   buttonText: {

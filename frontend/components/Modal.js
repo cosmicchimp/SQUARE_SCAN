@@ -34,6 +34,7 @@ export default function NewProject({
     Animated.timing(slideValue, {
       toValue: 1000,
       duration: 500,
+      gap: 20,
       useNativeDriver: true,
     }).start(() => {
       updateVisible(false);
@@ -61,10 +62,11 @@ export default function NewProject({
         >
           {/* Creation of the form view inside the modal */}
           <View style={styles.form}>
+            <Text style={styles.formTitle}>Create a new project:</Text>
             <TextInput
               style={styles.input}
               placeholder="Name of project"
-              placeholderTextColor="rgba(1, 1, 1, 0.76)"
+              placeholderTextColor="rgba(255, 255, 255, 0.81)"
               onChangeText={(val) => {
                 updateProjectName(val);
               }}
@@ -73,7 +75,7 @@ export default function NewProject({
             <TextInput
               style={styles.input}
               placeholder="Address"
-              placeholderTextColor="rgba(1, 1, 1, 0.76)"
+              placeholderTextColor="rgba(255, 255, 255, 0.81)"
               onChangeText={(val) => {
                 updateProjectAddress(val);
               }}
@@ -175,7 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   form: {
-    height: "40%",
+    height: "50%",
     width: "90%",
     backgroundColor: "white",
     alignSelf: "center",
@@ -183,14 +185,22 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "grey",
   },
+  formTitle: {
+    padding: "10%",
+    width: "90%",
+    alignSelf: "center",
+
+    fontSize: 24,
+    fontWeight: 900,
+  },
   input: {
-    backgroundColor: "rgba(60, 202, 238, 0.36)",
+    backgroundColor: "#055",
     borderWidth: 2,
     borderColor: "grey",
     padding: "5%",
     width: "90%",
     alignSelf: "center",
-    marginTop: "10%",
+    marginBottom: "10%",
     borderRadius: 5,
     fontSize: 18,
     fontWeight: 900,

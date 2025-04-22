@@ -36,7 +36,7 @@ export default function Profile() {
     AuthenticateUser(false);
   };
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }}>
+    <View style={{ flex: 1, backgroundColor: "#055" }}>
       {/* Modal */}
       <Animated.View
         style={[styles.modal, { transform: [{ translateX: modalValue }] }]}
