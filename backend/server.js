@@ -140,16 +140,17 @@ app.post("/projectpush", async (req, res) => {
     res.status(500).json({ message: "Server error", error: e.message });
   }
 });
-
+app.post("/");
 app.post("/cleardata", async (req, res) => {
   try {
     const { userEmail } = req.body;
+    console.log("useremail = ", userEmail);
     const deleteQuery =
-      await sql`DELETE FROM userbase.projects WHERE creator_id = (SELECT user_id from userbase.users WHERE email = ${userEmail});`;
-    res.status(500).json({ message: "Successful delete" });
+      await sql`DELETE FROM userbase.projects WHERE creator_id IN (SELECT user_id FROM userbase.users WHERE email = ${userEmail});`;
+    res.status(200).json({ message: "Successful delete" });
     console.log("deleted");
   } catch (e) {
     console.log("Error in delete server side: ", e);
-    res.status(404).json({ message: "Delete failed" });
+    res.status(500).json({ message: "Delete failed" });
   }
 });
