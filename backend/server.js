@@ -146,7 +146,7 @@ app.post("/grabaccountinfo", async (req, res) => {
     console.log(userEmail);
     const query =
       await sql`SELECT * FROM userbase.users WHERE users.email = ${userEmail}`;
-    console.log(query);
+    res.status(500).json({ data: query });
   } catch (e) {
     console.log("error in grabaccount server side:", e);
   }
