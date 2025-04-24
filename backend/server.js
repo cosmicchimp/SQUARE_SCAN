@@ -122,7 +122,7 @@ app.post("/projectpush", async (req, res) => {
   VALUES (${project_name}, ${
       user.user_id
     }, NOW(), ${`https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${encodeURIComponent(
-      address || "The Statue of Liberty"
+      address || "The Empire State Building"
     )}&key=${process.env.GOOGLE_STATIC_KEY}`}
 )
   RETURNING project_id
@@ -140,6 +140,18 @@ app.post("/projectpush", async (req, res) => {
     res.status(500).json({ message: "Server error", error: e.message });
   }
 });
+app.post("/grabaccountinfo", async (req, res) => {
+  try {
+    const { userEmail } = req.body;
+    const query =
+      await sql`SELECT * FROM userbase.users WHERE email = ${userEmail}`;
+    console.log(query);
+  } catch (e) {
+    console.log("error in grabaccount server side:", e);
+  }
+});
+
+app.post("/recievereview", async (req, res) => {});
 app.post("/cleardata", async (req, res) => {
   try {
     const { userEmail } = req.body;
