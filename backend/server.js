@@ -143,6 +143,7 @@ app.post("/projectpush", async (req, res) => {
 app.post("/grabaccountinfo", async (req, res) => {
   try {
     const { userEmail } = req.body;
+    console.log(userEmail);
     const query =
       await sql`SELECT * FROM userbase.users WHERE users.email = ${userEmail}`;
     console.log(query);
