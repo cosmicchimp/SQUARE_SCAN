@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
   Animated,
 } from "react-native";
 import {
@@ -16,102 +17,166 @@ import {
   FontAwesome6,
 } from "@expo/vector-icons";
 import { AuthContext } from "../context/AuthContext";
+import AccountInfo from "../components/profile_page_components/AccountInfo";
+import Theme from "../components/profile_page_components/Theme";
+import Language from "../components/profile_page_components/Language";
+import Support from "../components/profile_page_components/Support";
+import Review from "../components/profile_page_components/Review";
 export default function Profile() {
   const { AuthenticateUser } = useContext(AuthContext);
-  const [visible, setVisible] = useState(false);
-  const modalValue = useRef(new Animated.Value(1000)).current;
-
-  useEffect(() => {
-    Animated.timing(modalValue, {
-      toValue: visible ? 0 : 1000,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  }, [visible]);
-
-  const handleButtonPress = () => {
-    setVisible(true);
-  };
+  const [profileInfoVisible, updateProfileInfoVisible] = useState(false);
+  const [themeVisible, updateThemeVisible] = useState(false);
+  const [languageVisible, updateLanguageVisible] = useState(false);
+  const [supportVisible, updateSupportVisible] = useState(false);
+  const [reviewVisible, updateReviewVisible] = useState(false);
+  const { currentUser } = useContext(AuthContext);
   const handleLogOut = () => {
     AuthenticateUser(false);
   };
+  async function clearData() {
+    const databaseClear = await fetch(
+      "https://square-scan.onrender.com/cleardata",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: currentUser }),
+      }
+    );
+    const message = await databaseClear.json();
+    alert(
+      "Data successfully deleted. You may need to restart your app to see some changes take place"
+    );
+  }
   return (
-    <View style={{ flex: 1, backgroundColor: "#055" }}>
-      {/* Modal */}
-      <Animated.View
-        style={[styles.modal, { transform: [{ translateX: modalValue }] }]}
-      >
-        <TouchableOpacity
-          onPress={() => setVisible(false)}
-          style={styles.exitButton}
-        >
-          <Text style={styles.exitText}>Exit</Text>
-        </TouchableOpacity>
-        <Text style={{ color: "black", fontSize: 20 }}>
-          This is the modal content
-        </Text>
-      </Animated.View>
+    <>
+      <AccountInfo
+        currentUser={currentUser}
+        profileInfoVisible={profileInfoVisible}
+        updateProfileInfoVisible={updateProfileInfoVisible}
+      />
+      <Theme
+        themeVisible={themeVisible}
+        updateThemeVisible={updateThemeVisible}
+      />
+      <Language
+        languageVisible={languageVisible}
+        updateLanguageVisible={updateLanguageVisible}
+      />
+      <Support
+        supportVisible={supportVisible}
+        updateSupportVisible={updateSupportVisible}
+      />
+      <Review
+        reviewVisible={reviewVisible}
+        updateReviewVisible={updateReviewVisible}
+      />
+      <View style={{ flex: 1, backgroundColor: "#055" }}>
+        {/* Settings List */}
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <View style={[styles.section, { marginTop: "8%" }]}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                updateProfileInfoVisible(true);
+              }}
+            >
+              <Text style={styles.text}>Account info</Text>
+              <MaterialIcons name="account-circle" size={24} color="white" />
+            </TouchableOpacity>
 
-      {/* Settings List */}
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={[styles.section, { marginTop: "8%" }]}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Account info</Text>
-            <MaterialIcons name="account-circle" size={24} color="white" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                updateThemeVisible(true);
+              }}
+              style={styles.button}
+            >
+              <Text style={styles.text}>Theme</Text>
+              <MaterialCommunityIcons
+                name="theme-light-dark"
+                size={24}
+                color="white"
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleButtonPress} style={styles.button}>
-            <Text style={styles.text}>Theme</Text>
-            <MaterialCommunityIcons
-              name="theme-light-dark"
-              size={24}
-              color="white"
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                updateLanguageVisible(true);
+              }}
+            >
+              <Text style={styles.text}>Language</Text>
+              <FontAwesome name="language" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Language</Text>
-            <FontAwesome name="language" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Payment</Text>
-            <FontAwesome6 name="money-check-dollar" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                updateSupportVisible(true);
+              }}
+            >
+              <Text style={styles.text}>Support</Text>
+              <Entypo name="phone" size={24} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                updateReviewVisible(true);
+              }}
+            >
+              <Text style={styles.text}>Write a review</Text>
+              <MaterialIcons name="reviews" size={24} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                Alert.alert(
+                  "Are you sure you clear all data?",
+                  "This will remove all projects and photos associated with your account.",
+                  [
+                    {
+                      text: "No",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Yes",
+                      onPress: async () => {
+                        try {
+                          await clearData();
+                        } catch (e) {
+                          console.log("onPress Error: ", e);
+                        }
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.text}>Clear data</Text>
+              <Feather name="trash-2" size={24} color="white" />
+            </TouchableOpacity>
 
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Support</Text>
-            <Entypo name="phone" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Write a review</Text>
-            <MaterialIcons name="reviews" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Clear data</Text>
-            <Feather name="trash-2" size={24} color="white" />
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.text}>Legal</Text>
+              <FontAwesome name="legal" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Legal</Text>
-            <FontAwesome name="legal" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              handleLogOut();
-            }}
-          >
-            <Text style={styles.text}>Log out</Text>
-            <FontAwesome6 name="door-open" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                handleLogOut();
+              }}
+            >
+              <Text style={styles.text}>Log out</Text>
+              <FontAwesome6 name="door-open" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </>
   );
 }
 

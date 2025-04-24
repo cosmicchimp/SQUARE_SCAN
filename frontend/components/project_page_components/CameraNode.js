@@ -10,14 +10,13 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
-import { getHouseImage } from "../constants/CameraNodeDefaultImages";
+import { getHouseImage } from "../../constants/CameraNodeDefaultImages";
 
 const CameraNode = ({ index, styleButton }) => {
   const [hasPermission, setHasPermission] = useState(null);
-  const [imageUri, setImageUri] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-
+  const [imageUri, setImageUri] = useState(null);
   // Request Camera Permission
   React.useEffect(() => {
     (async () => {
@@ -71,7 +70,7 @@ const CameraNode = ({ index, styleButton }) => {
         }}
       >
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.image} />
+          <Image source={{ uri: imageUri[index] }} style={styles.image} />
         ) : (
           <Image source={placeholderImage} style={styles.placeholderimage} />
         )}

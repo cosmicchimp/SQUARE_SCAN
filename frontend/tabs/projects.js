@@ -11,14 +11,14 @@ import {
   Modal,
 } from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import PopupModal from "../components/Modal";
-import CameraNode from "../components/CameraNode";
+import PopupModal from "../components/project_page_components/Modal";
+import CameraNode from "../components/project_page_components/CameraNode";
 import { BlurView } from "expo-blur";
 import { useEffect, useState, useRef, useContext } from "react";
-import ProjectPull from "../components/ProjectPull";
-import projectPush from "../components/ProjectPush";
+import ProjectPull from "../components/project_page_components/ProjectPull";
+import projectPush from "../components/project_page_components/ProjectPush";
 import { AuthContext } from "../context/AuthContext";
-import InfoModal from "../components/InfoModal";
+import InfoModal from "../components/project_page_components/InfoModal";
 // Image paths (same as before)
 const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
 //

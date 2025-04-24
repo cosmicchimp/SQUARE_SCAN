@@ -11,13 +11,16 @@ import {
   Modal,
 } from "react-native";
 import { useState, useRef, useEffect } from "react";
-
-export default function InfoModal({ isInfoVisible, setInfoVisible }) {
+export default function AccountInfo({
+  currentUser,
+  profileInfoVisible,
+  updateProfileInfoVisible,
+}) {
   const slideValue = useRef(new Animated.Value(1000)).current;
   //  Timing animation for the modal
   function popup() {
     Animated.timing(slideValue, {
-      toValue: isInfoVisible ? 0 : 1000,
+      toValue: profileInfoVisible ? 0 : 1000,
       duration: 500,
       useNativeDriver: true,
     }).start();
@@ -28,69 +31,46 @@ export default function InfoModal({ isInfoVisible, setInfoVisible }) {
       duration: 500,
       useNativeDriver: true,
     }).start(() => {
-      setInfoVisible(false);
+      updateProfileInfoVisible(false);
     });
   }
   useEffect(() => {
     popup();
-  }, [isInfoVisible]);
+  }, [profileInfoVisible]);
+
   return (
     <>
-      {isInfoVisible && (
+      {profileInfoVisible && (
         <Animated.View
           style={[
             {
-              transform: [{ translateY: slideValue }],
+              transform: [{ translateX: slideValue }],
             },
             styles.infoModal,
           ]}
         >
-          <View style={{ flex: 1, backgroundColor: "#055" }}>
-            <Text style={styles.modalTitle}>SquareScan FAQ:</Text>
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.9) " }}>
+            <View style={styles.headerBox}>
+              <Text style={styles.modalTitle}>Account Info:</Text>
+            </View>
+
             <ScrollView>
               <View style={styles.faqBox}>
-                <Text style={styles.faqTitle}>How do I take a photo?</Text>
-                <Text style={styles.faqText}>
-                  By clicking on each of the 8 squares provided in the project
-                  page, you can open your camera and take a photo for each face
-                  of the house.
-                </Text>
-              </View>
-              <View style={styles.faqBox}>
+                <Text style={styles.faqTitle}>Email: {currentUser}</Text>
+                <Text style={styles.faqTitle}>Password: {currentUser}</Text>
                 <Text style={styles.faqTitle}>
-                  How do I get my measurements?
+                  Account Creation Date: {currentUser}
                 </Text>
-                <Text style={styles.faqText}>
-                  At the bottom of each project there should be a "Measurements"
-                  button. Clicking this will prompt you for a payment method,
-                  upon payment it will process and return measurements for each
-                  of your submitted photos.
-                </Text>
-              </View>
-              <View style={styles.bottomFaqBox}>
-                <Text style={styles.faqTitle}>
-                  How long to get measurements?
-                </Text>
-                <Text style={styles.faqText}>
-                  The time is takes to recieve all your measurements may vary.
-                  However at SquareScan we do our best to optimize all our
-                  processes and make sure it's the best experience possible for
-                  the user. If you experience any unusually long wait times
-                  please contact support.
-                </Text>
-              </View>
-            </ScrollView>
-            {/* bottom buttons */}
-            <View style={{ flex: 1, justifyContent: "flex-end", top: 2 }}>
-              <View style={styles.buttonBox}>
                 <TouchableOpacity
-                  onPress={() => slideDown()}
                   style={styles.closeButton}
+                  onPress={() => {
+                    slideDown();
+                  }}
                 >
                   <Text style={styles.closeText}>Exit</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </ScrollView>
           </View>
         </Animated.View>
       )}
@@ -103,6 +83,9 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     zIndex: 200000,
+  },
+  headerBox: {
+    backgroundColor: "black",
   },
   closeButton: {
     paddingHorizontal: 20, // Horizontal padding for left and right
