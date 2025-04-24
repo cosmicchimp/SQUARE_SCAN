@@ -15,7 +15,9 @@ export default function AccountInfo({
   currentUser,
   profileInfoVisible,
   updateProfileInfoVisible,
+  userInfo,
 }) {
+  console.log("COMING FROM ACCOUNT  INFO", userInfo);
   const slideValue = useRef(new Animated.Value(1000)).current;
   //  Timing animation for the modal
   function popup() {
@@ -56,10 +58,13 @@ export default function AccountInfo({
 
             <ScrollView>
               <View style={styles.faqBox}>
-                <Text style={styles.faqTitle}>Email: {currentUser}</Text>
-                <Text style={styles.faqTitle}>Password: {currentUser}</Text>
+                <Text style={styles.faqTitle}>Email: {userInfo.email}</Text>
                 <Text style={styles.faqTitle}>
-                  Account Creation Date: {currentUser}
+                  Phone: {userInfo.phone === null ? "None" : userInfo.phone}
+                </Text>
+                <Text style={styles.faqTitle}>Password: hidden</Text>
+                <Text style={styles.faqTitle}>
+                  Account Creation Date: {userInfo.created_at}
                 </Text>
                 <TouchableOpacity
                   style={styles.closeButton}

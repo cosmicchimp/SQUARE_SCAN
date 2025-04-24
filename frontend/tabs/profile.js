@@ -29,6 +29,7 @@ export default function Profile() {
   const [languageVisible, updateLanguageVisible] = useState(false);
   const [supportVisible, updateSupportVisible] = useState(false);
   const [reviewVisible, updateReviewVisible] = useState(false);
+  const [userInfo, updateUserInfo] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const handleLogOut = () => {
     AuthenticateUser(false);
@@ -47,12 +48,33 @@ export default function Profile() {
       "Data successfully deleted. You may need to restart your app to see some changes take place"
     );
   }
+  async function grabUserInfo() {
+    try {
+      const res = await fetch(
+        "https://square-scan.onrender.com/grabaccountinfo",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userEmail: currentUser,
+          }),
+        }
+      );
+      const data = await res.json();
+      updateUserInfo(data.data[0]);
+      console.log(data);
+    } catch (e) {
+      console.log("Error in grabuserinfo profile page:", e);
+    }
+  }
+
   return (
     <>
       <AccountInfo
         currentUser={currentUser}
         profileInfoVisible={profileInfoVisible}
         updateProfileInfoVisible={updateProfileInfoVisible}
+        userInfo={userInfo}
       />
       <Theme
         themeVisible={themeVisible}
@@ -76,7 +98,8 @@ export default function Profile() {
           <View style={[styles.section, { marginTop: "8%" }]}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => {
+              onPress={async () => {
+                await grabUserInfo();
                 updateProfileInfoVisible(true);
               }}
             >
@@ -132,7 +155,7 @@ export default function Profile() {
               style={styles.button}
               onPress={() => {
                 Alert.alert(
-                  "Are you sure you clear all data?",
+                  "Are you sure you want to clear all data?",
                   "This will remove all projects and photos associated with your account.",
                   [
                     {

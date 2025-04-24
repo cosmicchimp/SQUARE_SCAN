@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 
 // Create Context Provider
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, AuthenticateUser] = useState(true); // Default is false (not authenticated)
+  const [isAuthenticated, AuthenticateUser] = useState(false); // Default is false (not authenticated)
   const [currentUser, setCurrentUser] = useState("");
   return (
     <AuthContext.Provider
