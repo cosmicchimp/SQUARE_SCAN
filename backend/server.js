@@ -140,7 +140,6 @@ app.post("/projectpush", async (req, res) => {
     res.status(500).json({ message: "Server error", error: e.message });
   }
 });
-app.post("/");
 app.post("/cleardata", async (req, res) => {
   try {
     const { userEmail } = req.body;
