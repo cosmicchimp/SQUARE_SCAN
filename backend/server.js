@@ -145,7 +145,7 @@ app.post("/cleardata", async (req, res) => {
   try {
     const { userEmail } = req.body;
     const deleteQuery =
-      await sql`DELETE * FROM userbase.projects WHERE creator_id = (SELECT user_id from userbase.users WHERE email = ${userEmail});`;
+      await sql`DELETE FROM userbase.projects WHERE creator_id = (SELECT user_id from userbase.users WHERE email = ${userEmail});`;
     res.status(500).json({ message: "Successful delete" });
     console.log("deleted");
   } catch (e) {
