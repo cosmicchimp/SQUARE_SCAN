@@ -3,6 +3,9 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { neon } from "@neondatabase/serverless";
 import cors from "cors";
+const fs = require('fs');
+const path = require('path');
+
 
 const app = express();
 dotenv.config();
@@ -13,6 +16,8 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(express.json());
 app.use(cors());
 
+
+//This is the function that runs the user against the database for a login 
 const checkUser = async (user, pass) => {
   try {
     const result =
@@ -32,20 +37,43 @@ const checkUser = async (user, pass) => {
   }
 };
 
+//Helper functions to validate and sanitize the users emails on signup
+// Load the disposable email domains into a Set for efficient lookup
+const disposableDomains = new Set(
+  fs.readFileSync(path.join(__dirname, 'utils/disposable_email_blocklist.conf'), 'utf-8')
+    .split('\n')
+    .map(domain => domain.trim().toLowerCase())
+    .filter(Boolean)
+);
+function isValidEmailFormat(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+  return regex.test(email);
+}
+function isAllowedEmail(email) {
+  if (!isValidEmailFormat(email)) return false;
+  const domain = email.split('@')[1].toLowerCase();
+  return !disposableDomains.has(domain);
+}
+
 const signUpUser = async (email, password) => {
   try {
+    //testing the email validity before running the user account creation
+    if (!isAllowedEmail(email)) {    
+      return res.status(400).json({message:"Invalid email format"})
+    }
     const encryptedpass = await bcrypt.hash(password, 10); // Make sure to await bcrypt.hash
-    await sql`
-      INSERT INTO userbase.users(email, password, created_at) 
-      VALUES (${email}, ${encryptedpass}, NOW())
-    `;
-    console.log("User created");
-    return true; // Return a result indicating success
+      await sql`
+        INSERT INTO userbase.users(email, password, created_at) 
+        VALUES (${email}, ${encryptedpass}, NOW())
+      `;
+      console.log("User created");
+      return true; // Return a result indicating success}
   } catch (e) {
     console.log("Error: " + e);
     return false; // Return false in case of an error
   }
-};
+
+}
 // Basic route for testing
 app.get("/", async (req, res) => {
   try {
