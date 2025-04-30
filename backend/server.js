@@ -16,6 +16,7 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(express.json());
 app.use(cors());
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const validsymbols = ["!","@","#","$","%","^","&","*"]
 
 //This is the function that runs the user against the database for a login 
 const checkUser = async (user, pass) => {
@@ -59,7 +60,6 @@ function symbolCheck(password) {
   return valid
 }
 function isPasswordValid(password, verifypassword) {
-const validsymbols = ["!","@","#","$","%","^","&","*"]
 if (password.length < 9 || !symbolCheck(password) ||  password == verifypassword) {
   return false
 }
