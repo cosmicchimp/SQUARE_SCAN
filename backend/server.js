@@ -60,7 +60,7 @@ function symbolCheck(password) {
 }
 function isPasswordValid(password) {
 const validsymbols = ["!","@","#","$","%","^","&","*" ,]
-if (password.length() < 9 || !symbolCheck(password)) {
+if (password.length < 9 || !symbolCheck(password)) {
   return false
 }
 else {
