@@ -40,7 +40,7 @@ const checkUser = async (user, pass) => {
 //Helper functions to validate and sanitize the users emails on signup
 // Load the disposable email domains into a Set for efficient lookup
 const disposableDomains = new Set(
-  fs.readFileSync(path.join(__dirname, 'utils/disposable_email_blocklist.conf'), 'utf-8')
+  fs.readFileSync(path.join(__dirname, 'data/disposable_email_blocklist.conf'), 'utf-8')
     .split('\n')
     .map(domain => domain.trim().toLowerCase())
     .filter(Boolean)
