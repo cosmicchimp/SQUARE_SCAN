@@ -15,7 +15,7 @@ const sql = neon(process.env.DATABASE_URL);
 
 app.use(express.json());
 app.use(cors());
-
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 //This is the function that runs the user against the database for a login 
 const checkUser = async (user, pass) => {
