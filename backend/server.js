@@ -75,6 +75,7 @@ function isAllowedEmail(email) {
 
 const signUpUser = async (email, password, verifypassword) => {
   try {
+    console.log(`pass, verify pass: ${password} ${verifypassword}`)
     //testing the email validity before running the user account creation
     if (!isAllowedEmail(email) || !isPasswordValid(password, verifypassword)) {    
       return false
