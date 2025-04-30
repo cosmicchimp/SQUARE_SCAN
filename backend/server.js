@@ -152,7 +152,22 @@ app.post("/grabaccountinfo", async (req, res) => {
   }
 });
 
-app.post("/recievereview", async (req, res) => {});
+app.post("/reviewpush", async (req, res) => {
+  try{
+    const {poster_id, review} = req.body
+    await sql`
+    INSERT INTO userbase.reviews (poster_id, review)
+    VALUES (
+      (SELECT user_id FROM userbase.users WHERE email = ${poster_id}),
+      ${review}
+    )
+  `;
+    res.status(201).json({message:"Review successfully created"})
+  }
+  catch (e) {
+    res.status(500).json({message:e})
+  }
+});
 app.post("/cleardata", async (req, res) => {
   try {
     const { userEmail } = req.body;
