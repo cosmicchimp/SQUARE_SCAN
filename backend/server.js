@@ -136,7 +136,7 @@ app.post("/signup", async (req, res) => {
   } else {
     res.json({
       success: false,
-      message: "Account creation failed",
+      message: "Account creation failed, invalid email or password",
     });
   }
 });
