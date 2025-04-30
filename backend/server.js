@@ -59,8 +59,9 @@ const signUpUser = async (email, password) => {
   try {
     //testing the email validity before running the user account creation
     if (!isAllowedEmail(email)) {    
-      return res.status(400).json({message:"Invalid email format"})
+      return false
     }
+    else {
     const encryptedpass = await bcrypt.hash(password, 10); // Make sure to await bcrypt.hash
       await sql`
         INSERT INTO userbase.users(email, password, created_at) 
@@ -68,6 +69,7 @@ const signUpUser = async (email, password) => {
       `;
       console.log("User created");
       return true; // Return a result indicating success}
+    }
   } catch (e) {
     console.log("Error: " + e);
     return false; // Return false in case of an error
