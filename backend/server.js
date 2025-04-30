@@ -58,9 +58,9 @@ function symbolCheck(password) {
   }) 
   return valid
 }
-function isPasswordValid(password) {
-const validsymbols = ["!","@","#","$","%","^","&","*" ,]
-if (password.length < 9 || !symbolCheck(password)) {
+function isPasswordValid(password, verifypassword) {
+const validsymbols = ["!","@","#","$","%","^","&","*"]
+if (password.length < 9 || !symbolCheck(password) ||  password == verifypassword) {
   return false
 }
 else {
@@ -73,10 +73,10 @@ function isAllowedEmail(email) {
   return !disposableDomains.has(domain);
 }
 
-const signUpUser = async (email, password) => {
+const signUpUser = async (email, password, verifypassword) => {
   try {
     //testing the email validity before running the user account creation
-    if (!isAllowedEmail(email) || !isPasswordValid(password)) {    
+    if (!isAllowedEmail(email) || !isPasswordValid(password, verifypassword)) {    
       return false
     }
     else {
@@ -125,8 +125,8 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
-  const signup = await signUpUser(email, password); // Now this will work as expected
+  const { email, password, verifypassword} = req.body;
+  const signup = await signUpUser(email, password, verifypassword); // Now this will work as expected
 
   if (signup) {
     res.json({
