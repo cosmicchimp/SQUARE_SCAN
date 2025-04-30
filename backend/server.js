@@ -60,7 +60,7 @@ function symbolCheck(password) {
   return valid
 }
 function isPasswordValid(password, verifypassword) {
-if (password.length < 9 || !symbolCheck(password) ||  password == verifypassword) {
+if (password.length < 9 || !symbolCheck(password) ||  password !== verifypassword) {
   return false
 }
 else {
