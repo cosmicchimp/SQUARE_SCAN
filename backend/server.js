@@ -51,7 +51,7 @@ function isValidEmailFormat(email) {
   return regex.test(email); 
 }
 function symbolCheck(password) {
-  const valid = false
+  let valid = false
   validsymbols.forEach((symbol) => {
     if (password.includes(symbol)) {
       valid = true
