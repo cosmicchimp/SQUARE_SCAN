@@ -47,7 +47,25 @@ const disposableDomains = new Set(
 );
 function isValidEmailFormat(email) {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-  return regex.test(email);
+  return regex.test(email); 
+}
+function symbolCheck(password) {
+  const valid = false
+  validsymbols.forEach((symbol) => {
+    if (password.contains(symbol)) {
+      valid = true
+    }
+  }) 
+  return valid
+}
+function isPasswordValid(password) {
+const validsymbols = ["!","@","#","$","%","^","&","*" ,]
+if (password.length() < 9 || !symbolCheck(password)) {
+  return false
+}
+else {
+  return true
+}
 }
 function isAllowedEmail(email) {
   if (!isValidEmailFormat(email)) return false;
@@ -58,7 +76,7 @@ function isAllowedEmail(email) {
 const signUpUser = async (email, password) => {
   try {
     //testing the email validity before running the user account creation
-    if (!isAllowedEmail(email)) {    
+    if (!isAllowedEmail(email) || !isPasswordValid(password)) {    
       return false
     }
     else {
