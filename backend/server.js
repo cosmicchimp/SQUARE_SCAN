@@ -53,7 +53,7 @@ function isValidEmailFormat(email) {
 function symbolCheck(password) {
   const valid = false
   validsymbols.forEach((symbol) => {
-    if (password.contains(symbol)) {
+    if (password.includes(symbol)) {
       valid = true
     }
   }) 
