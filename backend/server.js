@@ -168,6 +168,14 @@ app.post("/reviewpush", async (req, res) => {
     res.status(500).json({message:e})
   }
 });
+app.post("/reviewpull", async (req, res) => {
+  try {
+    const reviews = await sql`SELECT * FROM userbase.reviews`
+    res.status(201).json({reviews:reviews}) }
+  catch (e) {
+    console.log("Error in review pull function: ", e)
+  }
+})
 app.post("/cleardata", async (req, res) => {
   try {
     const { userEmail } = req.body;
