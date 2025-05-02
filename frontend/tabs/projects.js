@@ -27,6 +27,8 @@ const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jp
 
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 //
 //This is the default export project component
 export default function Projects() {
@@ -58,24 +60,24 @@ export default function Projects() {
   const onPressArchive= () => { setsInArchive(true); setsInDrafts(false);};
   const getProjectHeaderButtons = () => {
     return (
-      <View style={{ flexDirection:"row", gap:30, paddingRight: 30 }}>
+      <View style={{ flexDirection:"row", gap:25, paddingRight: 30, alignItems: "center", justifyContent: "center"}}>
         <TouchableOpacity onPress={() => onPressArchive()}>
-          {isEditMode && (<Feather name="archive" size={24} color="#673AB7" />)}
+          {isEditMode && (<MaterialCommunityIcons name="archive-outline" size={27} color="#673AB7" />)}
         </TouchableOpacity>
         
-        <TouchableOpacity onPress={() => onPressDraft()}>
-          {isEditMode && <MaterialCommunityIcons name="file-edit-outline" size={24} color="#673AB7" />}
+        <TouchableOpacity onPress={() => isEditMode ? onPressDraft() : updateVisible(true)}>
+          {!isEditMode && <MaterialCommunityIcons name="plus-circle-outline" size={27} color="#673AB7" />}
+          {isEditMode && <MaterialCommunityIcons name="file-document-edit-outline" size={27} color="#673AB7" />}
         </TouchableOpacity>
         
         <TouchableOpacity onPress={() => onPressEdit()}>
           {!isEditMode 
           ? (<Feather name="edit" size={24} color="#673AB7" />)
-          : (<Feather name="x" size={24} color="#673AB7" />)}
+          : (<Feather name="x" size={26} color="#673AB7" />)}
         </TouchableOpacity>
       </View>
     )
   };
-
   useEffect(() => {
     navigation.setOptions({
       title: 
@@ -90,13 +92,13 @@ export default function Projects() {
     });
   }, [isEditMode, isInDrafts, isInArchive]);
 
+
   //Start of function tools
   const toggleSlide = (name, photo) => {
     updateModalInfo({
       name,
       photo,
     });
-
     Animated.timing(slide, {
       toValue: visible ? 500 : 0, // Slide out if visible, slide in if hidden
       duration: 300,
@@ -287,13 +289,28 @@ export default function Projects() {
               toggleSlide(item.project_name, item.image_links);
             }}
           >
-            <Image
-              source={{ uri: item.cover_photo }}
-              style={styles.coverImage}
-            />
-            <View style={styles.textBox}>
-              <Text style={styles.text}>{item.project_name}</Text>
-              <Text style={styles.text}>{item.created_at.slice(0, 10)}</Text>
+            <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
+
+            {/* image and description */}
+            <View style={{flexDirection:"row", justifyContent:"flex-start", }}>
+              <Image
+                source={{ uri: item.cover_photo }}
+                style={styles.coverImage}
+              />
+              <View style={styles.textBox}>
+                <Text style={styles.text}>{item.project_name}</Text>
+                <Text style={styles.text}>{item.created_at.slice(0, 10)}</Text>
+              </View>
+            </View>
+            
+            {/* archive and delete button */}
+            <View style={{height: "100%", justifyContent:"space-around", alignItems:"center", paddingHorizontal:5 }}>
+              {/* <TouchableOpacity style={{paddingVertical:20}}>
+                {isEditMode && <MaterialCommunityIcons name="archive-plus-outline" size={24} color="#673AB7" />}
+              </TouchableOpacity> */}
+              <TouchableOpacity style={{paddingVertical:20}}>
+                {isEditMode && <MaterialIcons name="do-not-disturb-on" size={30} color="#D32F2F" />}
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
@@ -306,7 +323,7 @@ const styles = StyleSheet.create({
   list: {
     alignSelf: "center",
     width: "90%",
-    gap: 40,
+    gap: 30,
     marginTop: 20,
     backgroundColor: "transparent",
   },
@@ -320,20 +337,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   listBox: {
-
-    borderRadius: 20,
-    height: 145,
+    borderRadius: 25,
+    height: 140,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    gap: "10%",
-    borderWidth: 2,
+    justifyContent:"space-between",
+    paddingHorizontal: 17,
+    overflow:"hidden",
+    borderWidth: 3,
     borderColor:"#673AB7",
-    backgroundColor: "rgba(255, 255, 255, 0.84)",
+    backgroundColor: "rgba(212, 212, 212, 0.4)",
   },
   textBox: {
     flexDirection: "column",
+    padding:60,
+
   },
   text: {
     color: "black",
@@ -363,7 +382,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 100,
     width: 100,
+    marginRight: 20,
     borderRadius: 15,
+    
   },
   body: {
     flex: 1,
