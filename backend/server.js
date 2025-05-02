@@ -242,7 +242,7 @@ app.post("/deleteproject", async (req,res) => {
   try {
     const {project_id} = req.body
     const deletion = await sql`DELETE FROM userbase.projects WHERE project_id = ${project_id}`
-    res.status(201).json({message:"Project successfully deleted"})
+    res.status(200).json({message:"Project successfully deleted"})
   }
   catch (e) {
     console.log("Error in project delete server side: ", e)
