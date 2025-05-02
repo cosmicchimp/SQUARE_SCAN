@@ -17,11 +17,11 @@ import {
   FontAwesome6,
 } from "@expo/vector-icons";
 import { AuthContext } from "../context/AuthContext";
-import AccountInfo from "../components/profile_page_components/AccountInfo";
-import Theme from "../components/profile_page_components/Theme";
-import Language from "../components/profile_page_components/Language";
-import Support from "../components/profile_page_components/Support";
-import Review from "../components/profile_page_components/Review";
+import AccountInfo from "../components/profile_components/AccountInfo";
+import Theme from "../components/profile_components/Theme";
+import Language from "../components/profile_components/Language";
+import Support from "../components/profile_components/Support";
+import Review from "../components/profile_components/Review";
 export default function Profile() {
   const { AuthenticateUser } = useContext(AuthContext);
   const [profileInfoVisible, updateProfileInfoVisible] = useState(false);
@@ -68,6 +68,7 @@ export default function Profile() {
     }
   }
 
+  const iconColor = "#673AB7";
   return (
     <>
       <AccountInfo
@@ -92,9 +93,9 @@ export default function Profile() {
         reviewVisible={reviewVisible}
         updateReviewVisible={updateReviewVisible}
       />
-      <View style={{ flex: 1, backgroundColor: "#055" }}>
+      <View style={{ flex: 1, backgroundColor: "#fff" }}>
         {/* Settings List */}
-        <ScrollView contentContainerStyle={styles.scroll}>
+        <ScrollView contentContainerStyle={styles.scroll} contentInsetAdjustmentBehavior="automatic">
           <View style={[styles.section, { marginTop: "8%" }]}>
             <TouchableOpacity
               style={styles.button}
@@ -104,7 +105,7 @@ export default function Profile() {
               }}
             >
               <Text style={styles.text}>Account info</Text>
-              <MaterialIcons name="account-circle" size={24} color="white" />
+              <MaterialIcons name="account-circle" size={24} color={iconColor} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -117,7 +118,7 @@ export default function Profile() {
               <MaterialCommunityIcons
                 name="theme-light-dark"
                 size={24}
-                color="white"
+                color={iconColor}
               />
             </TouchableOpacity>
 
@@ -128,7 +129,7 @@ export default function Profile() {
               }}
             >
               <Text style={styles.text}>Language</Text>
-              <FontAwesome name="language" size={24} color="white" />
+              <FontAwesome name="language" size={24} color={iconColor} />
             </TouchableOpacity>
           </View>
 
@@ -140,7 +141,7 @@ export default function Profile() {
               }}
             >
               <Text style={styles.text}>Support</Text>
-              <Entypo name="phone" size={24} color="white" />
+              <Entypo name="phone" size={24} color={iconColor} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
@@ -149,7 +150,7 @@ export default function Profile() {
               }}
             >
               <Text style={styles.text}>Write a review</Text>
-              <MaterialIcons name="reviews" size={24} color="white" />
+              <MaterialIcons name="reviews" size={24} color={iconColor} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
@@ -177,12 +178,12 @@ export default function Profile() {
               }}
             >
               <Text style={styles.text}>Clear data</Text>
-              <Feather name="trash-2" size={24} color="white" />
+              <Feather name="trash-2" size={24} color={iconColor} />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.button}>
               <Text style={styles.text}>Legal</Text>
-              <FontAwesome name="legal" size={24} color="white" />
+              <FontAwesome name="legal" size={24} color={iconColor} />
             </TouchableOpacity>
           </View>
 
@@ -194,7 +195,7 @@ export default function Profile() {
               }}
             >
               <Text style={styles.text}>Log out</Text>
-              <FontAwesome6 name="door-open" size={24} color="white" />
+              <FontAwesome6 name="door-open" size={24} color={iconColor} />
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -218,14 +219,14 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 25,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255, 255, 255, 0.65)",
+    borderTopColor: "rgba(0, 0, 0, 0.65)",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   text: {
     fontSize: 15,
     fontFamily: "System", // Update this to your actual font
-    color: "white",
+    color: "black",
   },
   modal: {
     position: "absolute",

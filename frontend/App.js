@@ -9,6 +9,8 @@ export default function App() {
     "Condensed-Regular": require("./assets/fonts/RobotoCondensed-Regular.ttf"),
     "Semi-Bold": require("./assets/fonts/RobotoCondensed-SemiBold.ttf"),
     "Lill-Lill": require("./assets/fonts/LilitaOne-Regular.ttf"),
+    "AppleTea": require("./assets/fonts/AppleTea.ttf"),
+
   });
 
   if (!fontsLoaded) {

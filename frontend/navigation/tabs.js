@@ -1,124 +1,134 @@
+import React, { use, useContext, useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image, StyleSheet, View, SafeAreaView } from "react-native";
-import ProjectScreen from "../tabs/projects.js";
-import ProfileScreen from "../tabs/profile.js";
-import HomeScreen from "../tabs/home.js";
-import NewScreen from "../tabs/new.js";
+import { StyleSheet, View, TouchableOpacity, StatusBar, Text} from "react-native";
+
+import { useRoute, useNavigationState, useIsFocused } from '@react-navigation/native';
 import { AuthContext } from "../context/AuthContext";
-import { useContext } from "react";
+import { AnimationContext } from "../context/AnimationContext";
+
+import ProjectScreen from "../tabs/projects";
+import ProfileScreen from "../tabs/profile";
+import HomeScreen from "../tabs/HomeScreen";
+
+import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { HomeModernIcon, UserIcon, Squares2X2Icon, } from "react-native-heroicons/solid";
+import { HomeModernIcon as HomeModernIconOutline, UserIcon as UserIconOutline, Squares2X2Icon as Squares2X2IconOutline, } from "react-native-heroicons/outline";
+
 const Tab = createBottomTabNavigator();
 
-const Navigator = () => {
-  const { isAuthenticated, AuthenticateUser, currentUser, setCurrentUser } =
-    useContext(AuthContext);
+const screens = [
+  {
+    name: "Projects",
+    component: ProjectScreen,
+    icons: { solid: Squares2X2Icon, outline: Squares2X2IconOutline },
+    },
+  {
+    name: "Square Scan",
+    component: HomeScreen,
+    icons: { solid: HomeModernIcon, outline: HomeModernIconOutline },
+  },
+  {
+    name: "Profile",
+    component: ProfileScreen,
+    icons: { solid: UserIcon, outline: UserIconOutline },
+  },
+];
+
+const Navigator = ({navigation, route}) => {
+  const { currentUser } = useContext(AuthContext);
+  const { expanded } = useContext(AnimationContext);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Icon Style: color based on the tab, focused state, and expanded state
+  const getIcon = (focused, expanded, icons) => {
+    const IconComponent = focused ? icons.solid : icons.outline;
+    const color = expanded
+      ? (focused ? "#ffffff" : "rgba(255,255,255,0.5)")
+      : (focused ? "#673AB7" : "#000000");
+    return <IconComponent size={34} color={color} />;
+  };
+
+    
+
+  const onPressEdit = () => {
+    setIsEditMode(!isEditMode);
+  }
+
+  // Get active tab index
+  const tabIndex = useNavigationState((state) => {
+    const tabState = state.routes.find(r => r.name === "Main")?.state;
+    return tabState?.index ?? 1;
+  });
+
+
   return (
+    <>
+    <StatusBar barStyle={(tabIndex === 1) ? "light-content" : "dark-content"} />
     <Tab.Navigator
+      initialRouteName="Square Scan"
       screenOptions={{
-        tabBarStyle: {
-          fontFamily: "Lill-Lill",
-          height: 110,
-          display: "flex",
-          flexDirection: "row",
-          backgroundColor: "rgba(255, 255, 255, 0.89)",
-          alignItems: "center",
+        tabBarStyle: expanded ? styles.purpleTabStyle : styles.whiteTabStyle,
+        headerShadowVisible: (!(tabIndex === 1)) ? true : false,
+        headerStyle: { 
+          backgroundColor: (tabIndex === 1) ? "#673AB7" : "#FFFFFF",
+          height: 100,
         },
-        headerTitleStyle: {
-          fontFamily: "Condensed-Regular",
-          fontSize: 24, // Change the font size
-          color: "black", // Change the text color
-          textTransform: "uppercase", // This makes the text uppercase
+        headerTitleStyle: 
+        {
+          color: (tabIndex === 1) ? "#FFF" : "#000",
+          fontFamily: "AppleTea", 
+          fontSize: 23,
         },
+        headerTitleAlign: (tabIndex === 1) ? "center" : "left",
+
       }}
     >
-      <Tab.Screen
-        name={"Home"}
-        component={HomeScreen}
-        initialParams={{ currentUser }}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            const imageSource = focused
-              ? require("../assets/home-svgrepo-(1).png")
-              : require("../assets/home-svgrepo-com.png");
-            return (
-              <View
-                style={[
-                  styles.iconContainer,
-                  focused ? styles.focusedView : null,
-                ]}
-              >
-                <Image style={styles.navIcon} source={imageSource} />
+      {screens.map(({ name, component, icons, title }) => (
+        <Tab.Screen
+          key={name}
+          name={name}
+          component={component}
+          initialParams={{ currentUser }}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.iconContainer}>
+                {getIcon(focused, expanded, icons)}
               </View>
-            );
-          },
-          tabBarShowLabel: false,
-        }}
-      />
-      <Tab.Screen
-        name={"Projects"}
-        initialParams={{ currentUser }}
-        component={ProjectScreen}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            const imageSource = focused
-              ? require("../assets/grid-search-svgrepo-com-filled.png") // Focused state image
-              : require("../assets/grid-search-svgrepo-com.png"); // Default image
-            return (
-              <View
-                style={[
-                  styles.iconContainer,
-                  focused ? styles.focusedView : null,
-                ]}
-              >
-                <Image style={styles.navIcon} source={imageSource} />
-              </View>
-            );
-          },
-          tabBarShowLabel: false,
-        }}
-      />
-
-      <Tab.Screen
-        name={"Profile"}
-        component={ProfileScreen}
-        initialParams={{ currentUser }}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            const imageSource = focused
-              ? require("../assets/profile-svgrepo-com (2).png") // Focused state image
-              : require("../assets/profile-svgrepo-com.png"); // Default image
-            return (
-              <View style={[styles.iconContainer]}>
-                <Image style={styles.profileIcon} source={imageSource} />
-              </View>
-            );
-          },
-          tabBarShowLabel: false,
-        }}
-      />
+            ),
+            tabBarShowLabel: false,
+          }}
+          
+        />
+      ))}
     </Tab.Navigator>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  whiteTabStyle: {
+    fontFamily: "Lill-Lill",
+    height: 80,
+    flexDirection: "row",
+    backgroundColor: "rgba(255, 255, 255, 0.89)",
+    alignItems: "center",
+  },
+  purpleTabStyle: {
+    fontFamily: "Lill-Lill",
+    height: 80,
+    flexDirection: "row",
+    backgroundColor: "#673AB7",
+    borderTopColor: "#673AB7",
+    alignItems: "center",
+  },
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 45,
-    marginTop: 40,
-    width: 50, // Explicit width for the icon container
-    height: 50, // Explicit height for the icon container
-  },
-  navIcon: {
-    width: 40,
-    height: 40,
-    resizeMode: "contain",
-    opacity: 0.8,
-  },
-  profileIcon: {
-    width: 35,
-    height: 35,
-    resizeMode: "contain",
-    opacity: 0.8,
+    marginTop: 30,
+    width: 50,
+    height: 50,
   },
 });
 

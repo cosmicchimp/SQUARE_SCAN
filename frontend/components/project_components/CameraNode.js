@@ -10,13 +10,15 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
+import * as FileSystem from "expo-file-system";
 import { getHouseImage } from "../../constants/CameraNodeDefaultImages";
 
-const CameraNode = ({ index, styleButton }) => {
+const CameraNode = ({ index, styleButton, onPhotoTaken }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageUri, setImageUri] = useState(null);
+
   // Request Camera Permission
   React.useEffect(() => {
     (async () => {
@@ -52,6 +54,8 @@ const CameraNode = ({ index, styleButton }) => {
 
     // set image
     if (!result.canceled && result.assets?.[0]?.uri) {
+      onPhotoTaken(result.uri);  // <-- **give project uri 
+
       console.log(`Result: ${result}, Assets: ${result.assets[0].uri}`);
       setImageUri(result.assets[0].uri);
     }
@@ -70,7 +74,7 @@ const CameraNode = ({ index, styleButton }) => {
         }}
       >
         {imageUri ? (
-          <Image source={{ uri: imageUri[index] }} style={styles.image} />
+          <Image source={{ uri: imageUri }} style={styles.image} />
         ) : (
           <Image source={placeholderImage} style={styles.placeholderimage} />
         )}

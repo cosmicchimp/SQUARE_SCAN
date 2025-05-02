@@ -11,16 +11,22 @@ import {
   Modal,
 } from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import PopupModal from "../components/project_page_components/Modal";
-import CameraNode from "../components/project_page_components/CameraNode";
+import PopupModal from "../components/project_components/Modal";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from 'expo-linear-gradient';
+
+// import { BlurView } from '@react-native-community/blur';
 import { useEffect, useState, useRef, useContext } from "react";
-import ProjectPull from "../components/project_page_components/ProjectPull";
-import projectPush from "../components/project_page_components/ProjectPush";
+import { useNavigation } from '@react-navigation/native';
+import ProjectPull from "../components/project_components/ProjectPull";
+import projectPush from "../components/project_components/ProjectPush";
 import { AuthContext } from "../context/AuthContext";
-import InfoModal from "../components/project_page_components/InfoModal";
+import InfoModal from "../components/project_components/InfoModal";
 // Image paths (same as before)
 const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
+
+import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 //
 //This is the default export project component
 export default function Projects() {
@@ -39,6 +45,51 @@ export default function Projects() {
   const [isInfoVisible, setInfoVisible] = useState(false);
   const [projectName, updateProjectName] = useState("");
   const [projectAddress, updateProjectAddress] = useState("");
+  const [photoURIs, setPhotoURIs] = useState({});
+
+
+  // Header Buttons: right icons buttons for Projects tab
+  const navigation = useNavigation();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isInDrafts, setsInDrafts] = useState(false);
+  const [isInArchive, setsInArchive] = useState(false);
+  const onPressEdit = () => { setIsEditMode(!isEditMode); setsInDrafts(false); setsInArchive(false);};
+  const onPressDraft = () => {setsInDrafts(true); setsInArchive(false);};
+  const onPressArchive= () => { setsInArchive(true); setsInDrafts(false);};
+  const getProjectHeaderButtons = () => {
+    return (
+      <View style={{ flexDirection:"row", gap:30, paddingRight: 30 }}>
+        <TouchableOpacity onPress={() => onPressArchive()}>
+          {isEditMode && (<Feather name="archive" size={24} color="#673AB7" />)}
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => onPressDraft()}>
+          {isEditMode && <MaterialCommunityIcons name="file-edit-outline" size={24} color="#673AB7" />}
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => onPressEdit()}>
+          {!isEditMode 
+          ? (<Feather name="edit" size={24} color="#673AB7" />)
+          : (<Feather name="x" size={24} color="#673AB7" />)}
+        </TouchableOpacity>
+      </View>
+    )
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: 
+      !isEditMode
+        ? "Projects" 
+        : isInDrafts
+          ? "Drafts"
+          : isInArchive
+            ? "Archives"
+            : "Edit Projects", 
+      headerRight: () => ( getProjectHeaderButtons()),
+    });
+  }, [isEditMode, isInDrafts, isInArchive]);
+
   //Start of function tools
   const toggleSlide = (name, photo) => {
     updateModalInfo({
@@ -53,6 +104,7 @@ export default function Projects() {
     }).start();
     setVisible(!visible);
   };
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -64,23 +116,41 @@ export default function Projects() {
     };
     fetchProjects();
   }, [dataStatus]);
+
+  // print out current photoURIs
+  useEffect(() => {
+    console.log("Updated photoURIs:");
+    Object.entries(photoURIs).forEach(([index, uri]) => {
+      console.log(`Index ${index}: ${uri}`);
+    });
+    }, [photoURIs]);
+
+
   const newProjectBox = () => {
     return (
-      <View style={styles.newProjectBox}>
-        <TouchableOpacity
-          style={styles.topButton}
-          onPress={() => {
-            updateVisible(true);
-          }}
-        >
-          <Text style={styles.headerText}>New</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.topButton}>
-          <Text style={styles.headerText}>Drafts</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.topButton}>
-          <Text style={styles.headerText}>Edit</Text>
-        </TouchableOpacity>
+      <View style={{flex:1, borderRadius: 20, overflow:"hidden"}}>
+        <LinearGradient
+        colors={["#673AB7", "#rgb(103,58,183)"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+        />
+          <BlurView
+            style={styles.newProjectBox}
+            intensity={20}
+          >
+            <TouchableOpacity style={styles.topButton} onPress={() => {updateVisible(true);}}>
+              <Text style={styles.headerText}>Archives</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.topButton}>
+              <Text style={styles.headerText}>Drafts</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.topButton}>
+              <Text style={styles.headerText}>Edit</Text>
+            </TouchableOpacity>
+          </BlurView>
       </View>
     );
   };
@@ -122,17 +192,17 @@ export default function Projects() {
             {/* top row of photos */}
             <View style={styles.topRow}>
               <View style={styles.photoButtonBox}>
-                <CameraNode index={0} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Back-left corner</Text>
               </View>
 
               <View style={styles.photoButtonBox}>
-                <CameraNode index={1} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Back</Text>
               </View>
 
               <View style={styles.photoButtonBox}>
-                <CameraNode index={2} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Back-right corner</Text>
               </View>
             </View>
@@ -140,31 +210,31 @@ export default function Projects() {
             {/* middle row of photos with logo */}
             <View style={styles.middleRow}>
               <View style={styles.photoButtonBox}>
-                <CameraNode index={3} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Left side</Text>
               </View>
 
               {/* logo */}
 
               <View style={styles.photoButtonBox}>
-                <CameraNode index={4} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Right side</Text>
               </View>
             </View>
 
             <View style={styles.bottomRow}>
               <View style={styles.photoButtonBox}>
-                <CameraNode index={5} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Front-left corner</Text>
               </View>
 
               <View style={styles.photoButtonBox}>
-                <CameraNode index={6} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Front</Text>
               </View>
 
               <View style={styles.photoButtonBox}>
-                <CameraNode index={7} styleButton={styles.photoModalButton} />
+                
                 <Text style={styles.buttonText}>Front-right corner</Text>
               </View>
             </View>
@@ -208,7 +278,7 @@ export default function Projects() {
 
       <FlatList
         data={userProjects}
-        ListHeaderComponent={newProjectBox}
+        ListHeaderComponent={null}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -235,38 +305,31 @@ export default function Projects() {
 const styles = StyleSheet.create({
   list: {
     alignSelf: "center",
-    width: "95%",
+    width: "90%",
     gap: 40,
     marginTop: 20,
-    paddingBottom: "20%",
-    backgroundColor: "#055",
+    backgroundColor: "transparent",
   },
   newProjectBox: {
-    marginTop: "5%",
-    paddingLeft: 20,
-    paddingTop: "8%",
-    paddingBottom: "8%",
-    borderRadius: 5,
+    overflow: "hidden",
+    height: 70,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: "20%",
-    borderWidth: 1,
-    borderColor: "grey",
-    backgroundColor: "rgba(255, 255, 255, 0.84)",
     justifyContent: "center",
   },
   listBox: {
-    paddingTop: 30,
-    paddingBottom: 30,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+
+    borderRadius: 20,
+    height: 145,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 20,
     gap: "10%",
-    borderWidth: 1,
-    borderColor: "grey",
+    borderWidth: 2,
+    borderColor:"#673AB7",
     backgroundColor: "rgba(255, 255, 255, 0.84)",
   },
   textBox: {
@@ -279,11 +342,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   headerText: {
-    color: "black",
-    fontFamily: "Condensed-Regular",
-    fontSize: 20,
-    marginTop: "3%",
-    alignSelf: "center",
+    color: "white",
+    fontFamily: "AppleTea",
+    fontSize: 16,
   },
   topTextBox: {
     flexDirection: "row",
@@ -300,14 +361,13 @@ const styles = StyleSheet.create({
   },
   coverImage: {
     width: "100%",
-    height: 95,
-    width: 95,
-    borderRadius: 5,
-    marginTop: 10,
+    height: 100,
+    width: 100,
+    borderRadius: 15,
   },
   body: {
     flex: 1,
-    backgroundColor: "#055",
+    backgroundColor: "#fdfdfd",
   },
   textBox: {
     gap: 0,
