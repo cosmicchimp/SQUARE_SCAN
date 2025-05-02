@@ -156,7 +156,25 @@ export default function Projects() {
       </View>
     );
   };
-  console.log("Current user: ", currentUser);
+
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isEditMode) {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 6,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(scaleAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isEditMode]);
+
   return (
     <View style={styles.body}>
       <PopupModal
@@ -304,14 +322,14 @@ export default function Projects() {
             </View>
             
             {/* archive and delete button */}
-            <View style={{height: "100%", justifyContent:"space-around", alignItems:"center", paddingHorizontal:5 }}>
+            <Animated.View style={{height: "100%", justifyContent:"space-around", alignItems:"center", paddingHorizontal:5, transform: [{ scale: scaleAnim }] }}>
               {/* <TouchableOpacity style={{paddingVertical:20}}>
                 {isEditMode && <MaterialCommunityIcons name="archive-plus-outline" size={24} color="#673AB7" />}
               </TouchableOpacity> */}
               <TouchableOpacity style={{paddingVertical:20}}>
                 {isEditMode && <MaterialIcons name="do-not-disturb-on" size={30} color="#D32F2F" />}
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           </TouchableOpacity>
         )}
       />
