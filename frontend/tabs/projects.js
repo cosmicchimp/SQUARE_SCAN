@@ -327,7 +327,7 @@ export default function Projects() {
                 {isEditMode && <MaterialCommunityIcons name="archive-plus-outline" size={24} color="#673AB7" />}
               </TouchableOpacity> */}
               <TouchableOpacity style={{paddingVertical:20}}>
-                {isEditMode && <MaterialIcons name="do-not-disturb-on" size={30} color="#D32F2F" />}
+                {<MaterialIcons name="do-not-disturb-on" size={30} color="#D32F2F" />}
               </TouchableOpacity>
             </Animated.View>
           </TouchableOpacity>
