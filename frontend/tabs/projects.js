@@ -13,22 +13,21 @@ import {
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import PopupModal from "../components/project_components/Modal";
 import { BlurView } from "expo-blur";
-import { LinearGradient } from 'expo-linear-gradient';
 
 // import { BlurView } from '@react-native-community/blur';
 import { useEffect, useState, useRef, useContext } from "react";
 import { useNavigation } from '@react-navigation/native';
 import ProjectPull from "../components/project_components/ProjectPull";
 import projectPush from "../components/project_components/ProjectPush";
+import ProjectDelete from "../components/project_components/ProjectDelete"
 import { AuthContext } from "../context/AuthContext";
 import InfoModal from "../components/project_components/InfoModal";
 // Image paths (same as before)
-const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
-
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+const logo = require("../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg");
 //
 //This is the default export project component
 export default function Projects() {
@@ -48,7 +47,9 @@ export default function Projects() {
   const [projectName, updateProjectName] = useState("");
   const [projectAddress, updateProjectAddress] = useState("");
   const [photoURIs, setPhotoURIs] = useState({});
-
+  // Track projects being deleted to animate them
+  const [deletingProjects, setDeletingProjects] = useState({});
+  const slideAnimations = useRef({}).current;
 
   // Header Buttons: right icons buttons for Projects tab
   const navigation = useNavigation();
@@ -92,6 +93,13 @@ export default function Projects() {
     });
   }, [isEditMode, isInDrafts, isInArchive]);
 
+  // Initialize or get animation reference for a project
+  const getSlideAnimation = (project_id) => {
+    if (!slideAnimations[project_id]) {
+      slideAnimations[project_id] = new Animated.Value(0);
+    }
+    return slideAnimations[project_id];
+  };
 
   //Start of function tools
   const toggleSlide = (name, photo) => {
@@ -107,11 +115,55 @@ export default function Projects() {
     setVisible(!visible);
   };
 
+  // Modified delete function with animation
+  async function deleteProject(project_id) {
+    try {
+      // Mark project as deleting to start animation
+      setDeletingProjects(prev => ({
+        ...prev,
+        [project_id]: true
+      }));
+      
+      // Animate slide out
+      Animated.timing(getSlideAnimation(project_id), {
+        toValue: -500, // Slide to left
+        duration: 300,
+        useNativeDriver: true,
+      }).start(async () => {
+        
+        // After animation completes, delete from database
+        const status = await ProjectDelete({project_id: project_id});
+        updateDataStatus(Math.random() * Math.random);
+        
+        // Clear the deleting state after a delay
+        setTimeout(() => {
+          setDeletingProjects(prev => {
+            const newState = {...prev};
+            delete newState[project_id];
+            return newState;
+          });
+        }, 300);
+        
+        alert(status);
+      });
+    }
+    catch (e) {
+      console.log("Error in deleteproject function call: ", e);
+      // Reset deleting state on error
+      setDeletingProjects(prev => {
+        const newState = {...prev};
+        delete newState[project_id];
+        return newState;
+      });
+    }
+  }
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const result = await ProjectPull({ currentUser: currentUser });
         updateProjects(result.query);
+        console.log(result.query)
       } catch (error) {
         console.error("Error in useEffect:", error);
       }
@@ -125,37 +177,8 @@ export default function Projects() {
     Object.entries(photoURIs).forEach(([index, uri]) => {
       console.log(`Index ${index}: ${uri}`);
     });
-    }, [photoURIs]);
+  }, [photoURIs]);
 
-
-  const newProjectBox = () => {
-    return (
-      <View style={{flex:1, borderRadius: 20, overflow:"hidden"}}>
-        <LinearGradient
-        colors={["#673AB7", "#rgb(103,58,183)"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
-        />
-          <BlurView
-            style={styles.newProjectBox}
-            intensity={20}
-          >
-            <TouchableOpacity style={styles.topButton} onPress={() => {updateVisible(true);}}>
-              <Text style={styles.headerText}>Archives</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.topButton}>
-              <Text style={styles.headerText}>Drafts</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.topButton}>
-              <Text style={styles.headerText}>Edit</Text>
-            </TouchableOpacity>
-          </BlurView>
-      </View>
-    );
-  };
 
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
@@ -300,38 +323,76 @@ export default function Projects() {
         data={userProjects}
         ListHeaderComponent={null}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.listBox}
-            onPress={() => {
-              toggleSlide(item.project_name, item.image_links);
-            }}
-          >
-            <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
+        renderItem={({ item }) => {
+          // Get or create animation value for this project
+          const slideAnim = getSlideAnimation(item.project_id);
+          
+          return (
+            <Animated.View style={[
+              styles.projectContainer,
+              { 
+                transform: [{ translateX: slideAnim }],
+                height: deletingProjects[item.project_id] ? 140 : 'auto',
+                opacity: deletingProjects[item.project_id] ? 0.8 : 1
+              }
+            ]}>
+              <TouchableOpacity
+                style={styles.listBox}
+                onPress={() => {
+                  toggleSlide(item.project_name, item.image_links);
+                }}
+              >
+                <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
 
-            {/* image and description */}
-            <View style={{flexDirection:"row", justifyContent:"flex-start", }}>
-              <Image
-                source={{ uri: item.cover_photo }}
-                style={styles.coverImage}
-              />
-              <View style={styles.textBox}>
-                <Text style={styles.text}>{item.project_name}</Text>
-                <Text style={styles.text}>{item.created_at.slice(0, 10)}</Text>
-              </View>
-            </View>
-            
-            {/* archive and delete button */}
-            <Animated.View style={{height: "100%", justifyContent:"space-around", alignItems:"center", paddingHorizontal:5, transform: [{ scale: scaleAnim }] }}>
-              {/* <TouchableOpacity style={{paddingVertical:20}}>
-                {isEditMode && <MaterialCommunityIcons name="archive-plus-outline" size={24} color="#673AB7" />}
-              </TouchableOpacity> */}
-              <TouchableOpacity style={{paddingVertical:20}}>
-                {<MaterialIcons name="do-not-disturb-on" size={30} color="#D32F2F" />}
+                {/* image and description */}
+                <View style={{flexDirection:"row", justifyContent:"flex-start", }}>
+                  <Image
+                    source={{ uri: item.cover_photo }}
+                    style={styles.coverImage}
+                  />
+                  <View style={styles.textBox}>
+                    <Text style={styles.text}>{item.project_name}</Text>
+                    <Text style={styles.text}>{item.created_at.slice(0, 10)}</Text>
+                  </View>
+                </View>
+                
+                {/* archive and delete button */}
+                <Animated.View style={{
+                  height: "100%",
+                  justifyContent:"space-around",
+                  alignItems:"center",
+                  paddingHorizontal:5,
+                  transform: [{ scale: scaleAnim }] 
+                }}>
+                  <TouchableOpacity 
+                    style={{paddingVertical:20}} 
+                    onPress={() => {
+                      Alert.alert(
+                        "Are you sure you want to delete this project?",
+                        "You will not be able to recover it later.",
+                        [
+                          {
+                            text: "No",
+                            style: "cancel",
+                          },
+                          {
+                            text: "Yes",
+                            onPress: () => {
+                              deleteProject(item.project_id)
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    {<MaterialIcons name="do-not-disturb-on" size={30} color="#D32F2F" />}
+                  </TouchableOpacity>
+                </Animated.View>
               </TouchableOpacity>
             </Animated.View>
-          </TouchableOpacity>
-        )}
+          );
+        }}
+        keyExtractor={(item) => item.project_id.toString()}
       />
     </View>
   );
@@ -344,6 +405,10 @@ const styles = StyleSheet.create({
     gap: 30,
     marginTop: 20,
     backgroundColor: "transparent",
+  },
+  projectContainer: {
+    overflow: "hidden",
+    marginBottom: 30,
   },
   newProjectBox: {
     overflow: "hidden",
@@ -369,8 +434,7 @@ const styles = StyleSheet.create({
   },
   textBox: {
     flexDirection: "column",
-    padding:60,
-
+    padding: 60,
   },
   text: {
     color: "black",
@@ -402,7 +466,6 @@ const styles = StyleSheet.create({
     width: 100,
     marginRight: 20,
     borderRadius: 15,
-    
   },
   body: {
     flex: 1,
@@ -500,7 +563,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,1)",
     borderWidth: 2,
-
     justifyContent: "center",
     alignItems: "center",
   },
