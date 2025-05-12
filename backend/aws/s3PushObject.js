@@ -1,6 +1,6 @@
-const express = require('express')
-const { PutObjectCommand } = require("@aws-sdk/client-s3")
-const s3 = require("./S3Client")
+import express from 'express'; // Use 'import' instead of 'require'
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import s3 from './S3Client.js'; // Ensure that you use correct path if necessary
 
 const router = express.Router()
 router.post("/s3PutObject", async (req, res) => {
