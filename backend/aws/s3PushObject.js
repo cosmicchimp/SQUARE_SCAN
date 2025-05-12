@@ -21,4 +21,4 @@ router.post("/s3PutObject", async (req, res) => {
 
     }
 })
-module.exports = router
+export default router

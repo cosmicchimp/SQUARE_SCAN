@@ -5,7 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import cors from "cors";
 import fs from 'fs'
 import path from 'path'
-const s3PutRoute = require('./aws/s3PushObject');
+import s3PutRoute from "./aws/s3PushObject.js";
 
 const app = express();
 dotenv.config();
