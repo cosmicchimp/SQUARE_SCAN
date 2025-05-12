@@ -8,7 +8,7 @@ router.post("/s3PutObject", async (req, res) => {
     console.log(formData)
     const params = {
         Bucket:"squarescantestbuckduckula",
-        Key:formData.itemKey | 123, 
+        Key:formData.itemKey || 123, 
         Body:formData.testText,
         ContentType:"text/plain"
     }
