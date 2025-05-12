@@ -5,7 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import cors from "cors";
 import fs from 'fs'
 import path from 'path'
-
+import s3PutRoute from "./aws/s3PushObject"
 
 const app = express();
 dotenv.config();
@@ -248,3 +248,4 @@ app.post("/deleteproject", async (req,res) => {
     console.log("Error in project delete server side: ", e)
   }
 })
+app.post("/s3PutObject", s3PutRoute)
