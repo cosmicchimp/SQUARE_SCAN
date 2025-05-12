@@ -4,11 +4,11 @@ import s3 from './S3Client.js'; // Ensure that you use correct path if necessary
 
 const router = express.Router()
 router.post("/s3PutObject", async (req, res) => {
-    const {testText, itemKey} = req.body
+    const {formData} = req.body
     const params = {
         Bucket:"squarescantestbuckduckula",
-        Key:itemKey, 
-        Body:testText,
+        Key:formData.itemKey | 123, 
+        Body:formData.testText,
         ContentType:"text/plain"
     }
     try {
