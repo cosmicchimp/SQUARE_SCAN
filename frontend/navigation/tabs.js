@@ -44,8 +44,9 @@ const Navigator = ({navigation, route}) => {
   const getIcon = (focused, expanded, icons) => {
     const IconComponent = focused ? icons.solid : icons.outline;
     const color = expanded
-      ? (focused ? "#ffffff" : "rgba(255,255,255,0.5)")
-      : (focused ? "#673AB7" : "#000000");
+      // ? (focused ? "#ffffff" : "rgba(255,255,255,0.5)")
+      ? (focused ? "#673AB7" : "#000000")
+      : (focused ? "#673AB7" : "#000");
     return <IconComponent size={34} color={color} />;
   };
 
@@ -64,19 +65,20 @@ const Navigator = ({navigation, route}) => {
 
   return (
     <>
-    <StatusBar barStyle={(tabIndex === 1) ? "light-content" : "dark-content"} />
+    <StatusBar barStyle={(tabIndex === 1) ? "dark-content" : "dark-content"} />
     <Tab.Navigator
       initialRouteName="Square Scan"
       screenOptions={{
         tabBarStyle: expanded ? styles.purpleTabStyle : styles.whiteTabStyle,
         headerShadowVisible: (!(tabIndex === 1)) ? true : false,
         headerStyle: { 
-          backgroundColor: (tabIndex === 1) ? "#673AB7" : "#FFFFFF",
+          backgroundColor: (tabIndex === 1) ? "#fff" : "#FFFFFF",
           height: 100,
+          borderBottomColor:  "#673AB7",
         },
         headerTitleStyle: 
         {
-          color: (tabIndex === 1) ? "#FFF" : "#000",
+          color: (tabIndex === 1) ? "#000" : "#000",
           fontFamily: "AppleTea", 
           fontSize: 23,
         },
@@ -111,6 +113,8 @@ const styles = StyleSheet.create({
     fontFamily: "Lill-Lill",
     height: 80,
     flexDirection: "row",
+        backgroundColor: "#fff",
+    borderTopColor: "#673AB7",
     backgroundColor: "rgba(255, 255, 255, 0.89)",
     alignItems: "center",
   },
@@ -118,8 +122,10 @@ const styles = StyleSheet.create({
     fontFamily: "Lill-Lill",
     height: 80,
     flexDirection: "row",
-    backgroundColor: "#673AB7",
-    borderTopColor: "#673AB7",
+    backgroundColor: "#fff",
+    borderTopColor: "#fff",
+    // backgroundColor: "#673AB7",
+    // borderTopColor: "#673AB7",
     alignItems: "center",
   },
   iconContainer: {
