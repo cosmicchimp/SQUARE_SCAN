@@ -6,38 +6,16 @@ import cors from "cors";
 import fs from 'fs'
 import path from 'path'
 import s3PutRoute from "./aws/s3PushObject.js";
-
+import checkUser from "./middleware/finduser.js"
+import { generateAccessToken, generateRefreshToken } from "./jwt/gentoken.js";
 const app = express();
 dotenv.config();
-
 const port = process.env.PORT || 4000;
 const sql = neon(process.env.DATABASE_URL);
-
 app.use(express.json());
 app.use(cors());
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const validsymbols = ["!","@","#","$","%","^","&","*"]
-
-//This is the function that runs the user against the database for a login 
-const checkUser = async (user, pass) => {
-  try {
-    const result =
-      await sql`SELECT * FROM userbase.users WHERE email = ${user}`;
-    if (result.length === 0) {
-      return false; // No user found
-    }
-    console.log("Stored hash:", result[0].password, "password:", pass);
-    const cryptCheck = await bcrypt.compare(
-      pass.trim(),
-      result[0].password.trim()
-    ); // Use result[0] to access the first user
-    return cryptCheck;
-  } catch (err) {
-    console.error("Database error during checkUser:", err);
-    return false;
-  }
-};
-
 //Helper functions to validate and sanitize the users emails on signup
 // Load the disposable email domains into a Set for efficient lookup
 const disposableDomains = new Set(
@@ -115,10 +93,10 @@ app.post("/login", async (req, res) => {
   console.log(
     `User (${email}) attemped to log in using password (${password})`
   );
-  const isValid = await checkUser(email, password);
+  const isValid = await checkUser({email:email, password:password});
   if (isValid) {
     console.log(`User '${email}' is logged in!`);
-    res.json({ success: true, message: "Login successful" });
+    res.json({ success: true, message: "Login successful"});
   } else {
     console.log("Log in denied");
     res.json({ success: false, message: "Login failed" });
