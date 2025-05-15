@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-
+import bcrypt from "bcrypt"
 const sql = neon(process.env.DATABASE_URL);
 
 export default async function checkUser(user, password) {
