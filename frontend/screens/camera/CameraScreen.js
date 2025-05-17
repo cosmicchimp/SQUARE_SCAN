@@ -12,6 +12,7 @@ import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { PhotoIcon, PaperAirplaneIcon, XMarkIcon } from "react-native-heroicons/solid";
 import { CircularSlider } from '../../components/camera_components/CircularSlider';
 import Animated, { withTiming, withSpring,interpolate, useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import Feather from '@expo/vector-icons/Feather';
 
 const {width} = Dimensions.get("screen");
 const _itemSize = width * 0.25;
@@ -43,8 +44,6 @@ const CameraScreen = () => {
   };
 
   /////////////////
-
-
 
   const [rotation, setRotation] = useState(null);
 
@@ -92,6 +91,7 @@ const CameraScreen = () => {
   const uiOpacityShared = useSharedValue(1); // For general UI elements based on orientation
   const carouselToggleShared = useSharedValue(0); // 0 for carousel closed, 1 for carousel open
   const sliderScrollX = useSharedValue(0); // the value of the current index as a float from 0.0 to length
+  const headerIconsAnimation = useSharedValue(0); // 0 for default icons, 1 for carousel-visible icons
 
   //////////////////
   // UI opacity animation
@@ -114,6 +114,13 @@ const CameraScreen = () => {
       ? withSpring(1, {  duration: 300 }) 
       : withSpring(0, {  duration: 200 })); 
   };
+
+  // Effect to animate header icons based on carousel visibility
+  useEffect(() => {
+    headerIconsAnimation.value = withTiming(isCarouselVisible ? 1 : 0, { duration: 250 });
+  }, [isCarouselVisible, headerIconsAnimation]);
+
+
 
   /////////////////
   // Animation Styles
@@ -159,6 +166,34 @@ const CameraScreen = () => {
       };
   });
 
+   // Header Icon Animation Styles
+  const questionIconStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(headerIconsAnimation.value, [0, 1], [1, 0]),
+    transform: [{ scale: interpolate(headerIconsAnimation.value, [0, 1], [1, 0.8]) }],
+  }));
+
+  const trashIconStyle = useAnimatedStyle(() => ({
+    opacity: headerIconsAnimation.value,
+    transform: [{ scale: interpolate(headerIconsAnimation.value, [0, 1], [0.8, 1]) }],
+  }));
+
+  const xIconStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(headerIconsAnimation.value, [0, 1], [1, 0]),
+    transform: [{ scale: interpolate(headerIconsAnimation.value, [0, 1], [1, 0.8]) }],
+  }));
+
+  const editIconStyle = useAnimatedStyle(() => ({
+    opacity: headerIconsAnimation.value,
+    transform: [{ scale: interpolate(headerIconsAnimation.value, [0, 1], [0.8, 1]) }],
+  }));
+
+  const downloadButtonContainerStyle = useAnimatedStyle(() => {
+    const opacity = headerIconsAnimation.value;
+    return {
+      opacity: opacity,
+      transform: [{ scale: interpolate(opacity, [0, 1], [0.8, 1]) }],
+    };
+  });
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -188,28 +223,33 @@ const CameraScreen = () => {
     };
 
     const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-    return () => {
-      subscription.remove();
-    };
+    return () => { subscription.remove(); };
   }, []);
 
   // Determine if the camera should be active based on focus, permissions, and app state.
   // Controls the rendering of CameraView.
   const shouldCameraBeActive = isFocused && permission?.granted && appIsActive;
- function consoleLogReason(reason) {
-    console.log(` > Reason: ${reason}`);
-  }
+  function consoleLogReason(reason) {console.log(` > Reason: ${reason}`);}
+
+  // log state of camera (focused, not focused, no permission or app not active)
   useEffect(() => {
     if (shouldCameraBeActive) {
       console.log('Camera should be active and rendered.');
     } else {
-      console.log('Camera should NOT be active. It will be unmounted or not rendered.');
+      console.log('Camera NOT active. Unmounted.');
       if (!isFocused) consoleLogReason('Screen not focused.');
       if (!permission?.granted) consoleLogReason('Permission not granted.');
       if (!appIsActive) consoleLogReason('App not active.');
     }
   }, [shouldCameraBeActive, isFocused, permission, appIsActive]);
+
+  const [isPlaceholderVisible, setIsPlaceholderVisible] = useState(false);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsPlaceholderVisible(true);
+    }, 1000); 
+    return () => clearTimeout(timeoutId); // Cleanup function to clear the timeout if the component unmounts
+  }, [isFocused]);
 
   /////////////////
 
@@ -229,30 +269,16 @@ const CameraScreen = () => {
 
           />
         ) : (
-          <View style={styles.centered}>
-            <Text style={styles.infoText}>
-              {isFocused ? "Camera paused" : "Camera not active (screen not focused)"}
-            </Text>
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' }]}>
+            {isPlaceholderVisible && 
+              (<Text style={styles.infoText}>
+                {(isFocused) ? "Camera paused" : "Camera not active"}
+              </Text>)
+            }
           </View>
         )}
 
-        {/* header */}
-        <Animated.View style={[styles.header, UIAnimatedStyle]}>
-          <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
-
-          <TouchableOpacity style={styles.headerButton} onPress={() => {/* TODO: Help Action */}}>
-            <Octicons name="question" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.headerButton} onPress={() => {
-            
-            navigation.goBack();
-            setTimeout(() => { LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); setExpanded(false); }, 50);
-          }}>
-            <Octicons name="x" size={27} color="#fff" />
-          </TouchableOpacity>
-
-        </Animated.View>
+        
 
 
         {/* main footer */}
@@ -284,7 +310,7 @@ const CameraScreen = () => {
                 style={[styles.footerButton, { backgroundColor: isCarouselVisible ? "rgba(255,80,80,0.35)" : "rgba(255,255,255,0.2)", maxHeight:_itemSize, maxWidth:_itemSize, }]}
                 onPress={toggleCarousel}
               >
-                {isCarouselVisible ? <XMarkIcon size={28} color="#fff" /> : <PhotoIcon size={28} color={"#fff"} />}
+                {isCarouselVisible ? <Octicons name="x" size={28} color="#fff" /> : <PhotoIcon size={28} color={"#fff"} />}
                 <Text style={styles.footerText}>{isCarouselVisible ? "Close" : "Images"}</Text>
               </TouchableOpacity>
               {!isCarouselVisible && photos.length > 0 && (
@@ -309,6 +335,71 @@ const CameraScreen = () => {
           </View>
         </Animated.View>
 
+        {/* Header */}
+        <Animated.View style={[styles.header, UIAnimatedStyle]}>
+            <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
+
+            {/* Left Button: Question / Trash */}
+            <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => {
+                    if (isCarouselVisible) {
+                        console.log("Trash Action Triggered"); // TODO: Implement actual trash action
+                    } else {
+                        console.log("Help Action Triggered"); // TODO: Implement actual help action
+                    }
+                }}
+            >
+                <Animated.View style={[styles.headerButton, questionIconStyle, {display: !isCarouselVisible ? 'flex': "none"}]}>
+                    <Octicons name="question" size={24} color="#fff" />
+                </Animated.View>
+                <Animated.View style={[styles.headerButton, trashIconStyle, {display: isCarouselVisible ? 'flex': "none"}]}>
+                    <Feather name="trash-2" size={24} color="red" />
+                </Animated.View>
+            </TouchableOpacity>
+
+            {/* Right Button Group */}
+            <View style={{ paddingHorizontal:15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', }}>
+              {/* Download Button (appears with Edit) */}
+                <Animated.View style={[downloadButtonContainerStyle, {display: isCarouselVisible ? 'flex': "none"}]}>
+                    <TouchableOpacity
+                        style={[styles.headerButton]} // Adjusted padding
+                        onPress={() => {
+                            if (isCarouselVisible) {
+                                console.log("Download Action Triggered"); // TODO: Implement actual download action
+                            }
+                        }}
+                    >
+                        <Feather name="download" size={24} color="#fff" />
+                    </TouchableOpacity>
+                </Animated.View>
+
+                {/* Edit Button (replaces X) */}
+                <TouchableOpacity
+                    style={{}}
+                    onPress={() => {
+                        if (isCarouselVisible) {
+                            console.log("Edit Action Triggered (does nothing for now)");
+                        } else {
+                            navigation.goBack();
+                            setTimeout(() => { 
+                                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); 
+                                setExpanded(false); 
+                            }, 50);
+                        }
+                    }}
+                >
+                    <Animated.View style={[styles.headerButton, xIconStyle, {display: !isCarouselVisible ? 'flex': "none"}]}>
+                        <Octicons name="x" size={27} color="#fff" />
+                    </Animated.View>
+                    <Animated.View style={[styles.headerButton, editIconStyle, {display: isCarouselVisible ? 'flex': "none"}]}>
+                        <Feather name="edit-3" size={24} color="#fff" />
+                    </Animated.View>
+                </TouchableOpacity>
+            </View>
+
+        </Animated.View>
+
         {/* photo button */}
         <Animated.View style={[oppositeUIAnimatedStyle, {flex: 1 }]}>
           <TouchableOpacity onPress={takePhoto} style={styles.photoButton} disabled={isCarouselVisible}>
@@ -317,7 +408,7 @@ const CameraScreen = () => {
         </Animated.View>
 
         {/* info  */}
-        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, alignItems: 'center' }}>
+        {/* <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, alignItems: 'center' }}>
           {rotation ? (
             <Text style={{ color: '#fff', fontSize: 12, textAlign: 'center', marginTop: 10 }}>
               α (Z - Yaw): {(rotation.alpha * 180 / Math.PI).toFixed(2)}°{'\n'}
@@ -327,7 +418,7 @@ const CameraScreen = () => {
           ) : (
             <Text>Waiting for orientation...</Text>
           )}
-        </View>
+        </View> */}
 
       </View>
     </TouchableWithoutFeedback>
@@ -337,15 +428,16 @@ const CameraScreen = () => {
 const styles = StyleSheet.create({
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black', // Ensure background for text visibility
+    justifyContent: "space-around",
+    alignItems: 'flex-end',
+    backgroundColor: 'red', // Ensure background for text visibility
   },
   infoText: {
     color: 'white',
     fontSize: 18,
     textAlign: 'center',
     padding: 20,
+    fontFamily: "AppleTea", 
   },
   containerFill: {
     flex: 1, flexDirection: 'row',
@@ -371,12 +463,12 @@ const styles = StyleSheet.create({
     width:"100%",
     height:100,
     alignItems:"flex-end",
+    paddingBottom:15,
     justifyContent:"space-between",
     zIndex: 10,
   },
   headerButton:{
-    paddingVertical:15,
-    paddingHorizontal:30,
+    paddingHorizontal:15,
     justifyContent:"center",
     alignItems:"center"
   },

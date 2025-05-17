@@ -15,6 +15,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { HomeModernIcon, UserIcon, Squares2X2Icon, } from "react-native-heroicons/solid";
 import { HomeModernIcon as HomeModernIconOutline, UserIcon as UserIconOutline, Squares2X2Icon as Squares2X2IconOutline, } from "react-native-heroicons/outline";
 
+const PURPLE_COLOR = "#673AB7"
 const Tab = createBottomTabNavigator();
 
 const screens = [
@@ -44,13 +45,10 @@ const Navigator = ({navigation, route}) => {
   const getIcon = (focused, expanded, icons) => {
     const IconComponent = focused ? icons.solid : icons.outline;
     const color = expanded
-      // ? (focused ? "#ffffff" : "rgba(255,255,255,0.5)")
-      ? (focused ? "#673AB7" : "#000000")
-      : (focused ? "#673AB7" : "#000");
+      ? (focused ? PURPLE_COLOR : PURPLE_COLOR)
+      : (focused ? PURPLE_COLOR : "#000");
     return <IconComponent size={34} color={color} />;
   };
-
-    
 
   const onPressEdit = () => {
     setIsEditMode(!isEditMode);
@@ -61,7 +59,6 @@ const Navigator = ({navigation, route}) => {
     const tabState = state.routes.find(r => r.name === "Main")?.state;
     return tabState?.index ?? 1;
   });
-
 
   return (
     <>
@@ -74,16 +71,15 @@ const Navigator = ({navigation, route}) => {
         headerStyle: { 
           backgroundColor: (tabIndex === 1) ? "#fff" : "#FFFFFF",
           height: 100,
-          borderBottomColor:  "#673AB7",
+          borderBottomColor:  PURPLE_COLOR,
         },
         headerTitleStyle: 
         {
-          color: (tabIndex === 1) ? "#000" : "#000",
+          color: (tabIndex === 1) ? PURPLE_COLOR : "#000",
           fontFamily: "AppleTea", 
-          fontSize: 23,
+          fontSize: (tabIndex === 1) ? 26 : 23,
         },
         headerTitleAlign: (tabIndex === 1) ? "center" : "left",
-
       }}
     >
       {screens.map(({ name, component, icons, title }) => (
@@ -114,7 +110,7 @@ const styles = StyleSheet.create({
     height: 80,
     flexDirection: "row",
         backgroundColor: "#fff",
-    borderTopColor: "#673AB7",
+    borderTopColor: PURPLE_COLOR,
     backgroundColor: "rgba(255, 255, 255, 0.89)",
     alignItems: "center",
   },

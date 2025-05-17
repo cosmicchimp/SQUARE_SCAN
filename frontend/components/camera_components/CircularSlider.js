@@ -147,7 +147,7 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
         // Determine border width based on dragging state
         const newActiveIndex = Math.round(scrollX.value);
         // Show border when active or when in edit mode (if not dragging)
-        const currentBorderWidth = (newActiveIndex === index) ? (isDragging.value ? 2 : (isEditMode ? 2 : 4)) : (isEditMode ? 2 : 0); // Show border in edit mode
+        const currentBorderWidth = (newActiveIndex === index) ? (isDragging.value ? 2 : (isEditMode ? 2 : 5)) : (isEditMode ? 2 : 0); // Show border in edit mode
 
         // Apply jiggle if editing
         const rotateZ = isEditMode ? jigglePhase.value : 0;
@@ -178,7 +178,7 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
             zIndex:1000,
             width: _itemSize,
             height: _itemSize,
-            borderRadius: _itemSize / 4,
+            borderRadius: _itemSize / 5,
             pointerEvents: 'box-none',
           },
           finalItemStyle,
@@ -188,7 +188,7 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
           <ImageBackground
             source={{ uri: imageUri }}
             style={{ flex: 1 }}
-            imageStyle={{ borderRadius: _itemSize / 4 }} 
+            imageStyle={{ borderRadius: _itemSize / 5 }} 
           >
           {/* Overlay with animated opacity */}
           <Animated.View
@@ -197,23 +197,24 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
                 flex: 1,
                 backgroundColor: 'black',
                 borderRadius: _itemSize / 4,
-              },
-              overlayAnimatedStyle, // AnimateS opacity to 0 → 0.5 → 0
+              }, overlayAnimatedStyle, // AnimateS opacity to 0 → 0.5 → 0
             ]}
           />
+
+          {/* item delete button when long pressed*/}
           <AnimatedTouchableOpacity
                 style={[
                     {
-                        position: 'absolute',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: DELETE_BUTTON_SIZE,
-                        height: DELETE_BUTTON_SIZE,
-                        borderRadius: DELETE_BUTTON_SIZE / 2,
-                        backgroundColor: PURPLE_COLOR,
-                        top: -DELETE_BUTTON_SIZE / 3, // Position near the top-right corner
-                        right: -DELETE_BUTTON_SIZE / 3,
-                        zIndex: 101, // Ensure button is above the item
+                      position: 'absolute',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: DELETE_BUTTON_SIZE,
+                      height: DELETE_BUTTON_SIZE,
+                      borderRadius: DELETE_BUTTON_SIZE / 2,
+                      backgroundColor: PURPLE_COLOR,
+                      top: -DELETE_BUTTON_SIZE / 3, // Position near the top-right corner
+                      right: -DELETE_BUTTON_SIZE / 3,
+                      zIndex: 101, // Ensure button is above the item
                     },
                     deleteButtonAnimatedStyle, // Animate appearance
                 ]}
@@ -249,19 +250,19 @@ export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEdit
   const growAnim = useSharedValue(1);
 
   // Update rotation based on orientation
-  useEffect(() => {
-    if (orientation === 'LANDSCAPE_LEFT') {
-      imageRotation.value = withTiming('90deg', { duration: 300 });
-      growAnim.value = withTiming(1.80, { duration: 500 });
-    } else if (orientation === 'LANDSCAPE_RIGHT') {
-      imageRotation.value = withTiming('-90deg', { duration: 300 });
-      growAnim.value = withTiming(1.8, { duration: 500 });
-    } else {
-      growAnim.value = withTiming(1, { duration: 300 });
-      imageRotation.value = withTiming('0deg', { duration: 300 });
+  // useEffect(() => {
+  //   if (orientation === 'LANDSCAPE_LEFT') {
+  //     imageRotation.value = withTiming('90deg', { duration: 300 });
+  //     growAnim.value = withTiming(1.80, { duration: 500 });
+  //   } else if (orientation === 'LANDSCAPE_RIGHT') {
+  //     imageRotation.value = withTiming('-90deg', { duration: 300 });
+  //     growAnim.value = withTiming(1.8, { duration: 500 });
+  //   } else {
+  //     growAnim.value = withTiming(1, { duration: 300 });
+  //     imageRotation.value = withTiming('0deg', { duration: 300 });
 
-    }
-  }, [orientation]);
+  //   }
+  // }, [orientation]);
 
   // Animated style using the shared rotation value
   const animatedStyle = useAnimatedStyle(() => {
@@ -306,17 +307,16 @@ export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEdit
               {
                 position: 'absolute',
                 top: "28%",
-                height: "25%",
+                height: `${26}%`,
                 backgroundColor: "transparent",
-                paddingHorizontal:7,
-                borderRadius: 25
+                borderRadius: 0
               }]}
               
           >
             {/* //style={{overflow:'hidden',width:"100%", height:"100%", borderRadius:20, aspectRatio: 16 / 9}}  /> */}
             <Animated.Image 
               source={{ uri: photos[activeIndex] }} 
-              style={{ overflow: 'hidden', width: "100%", height: "100%", borderRadius: 25, aspectRatio: 16 / 9 }}
+              style={{ overflow: 'hidden', width: "100%", height: "100%", borderRadius: 0, aspectRatio: 16 / 9 }}
               key={`image-${activeIndex}`}
               entering={FadeIn.duration(500)}
               exiting={FadeOut.duration(500)}
@@ -361,6 +361,7 @@ export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEdit
           snapToInterval={_itemSize + _spacing}
           decelerationRate="fast"
           bounces={true}
+          scrollEnabled={photos.length <= 0 ? false : true}
         />
       </AnimatedView>
     </View>
