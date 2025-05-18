@@ -9,7 +9,7 @@ import s3PutRoute from "./aws/s3PushObject.js";
 import checkUser from "./middleware/finduser.js"
 import { generateAccessToken, generateRefreshToken } from "./jwt/gentoken.js";
 import checkRefreshToken from "./jwt/checkrefreshtoken.js";
-import checkAccessToken from "./jwt/checkAccessToken.js";
+import checkAccessToken from "./jwt/checkaccesstoken.js";
 import signUpUser from "./middleware/signupuser.js";
 const app = express();
 dotenv.config();
