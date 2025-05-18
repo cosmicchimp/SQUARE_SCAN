@@ -29,7 +29,7 @@ app.get("/", async (req, res) => {
   }
 });
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {const { email, password } = req.body;
   console.log(
     `User (${email}) attemped to log in using password (${password})`
   );
@@ -46,7 +46,11 @@ app.post("/login", async (req, res) => {
   } else {
     console.log("Log in denied");
     res.json({ success: false, message: "Login failed" });
+  }}
+  catch (e) {
+    console.log("Error in log in route: ", e)
   }
+  
 });
 app.post("/gat", async (req, res) => {
   const {email} = req.body
