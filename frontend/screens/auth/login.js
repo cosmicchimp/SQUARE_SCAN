@@ -11,6 +11,7 @@ import {
 import { useState, useContext, useEffect, useRef } from "react";
 import Logo from "../../assets/Logos/Gemini_Generated_Image_sl6i2osl6i2osl6i.jpg";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import * as SecureStore from 'expo-secure-store'
 import { AuthContext } from "../../context/AuthContext";
 export default function LoginScreen() {
   const [username, updateUsername] = useState("");
@@ -19,6 +20,9 @@ export default function LoginScreen() {
   const slideValue = useRef(new Animated.Value(1000)).current;
   const { AuthenticateUser, isAuthenticated, setCurrentUser } =
     useContext(AuthContext);
+  const getToken = async () => {
+    return await SecureStore.getItemAsync('jwt');
+      };
   // Trigger the slide animation when signupVisible changes
   useEffect(() => {
     Animated.timing(slideValue, {
@@ -44,10 +48,12 @@ export default function LoginScreen() {
     if (loginResponse.success == false) {
       alert("Log in failed");
     } else if (loginResponse.success == true) {
+      console.log(loginResponse.accessToken)
+      await SecureStore.setItemAsync('accessToken', loginResponse.accessToken);
       AuthenticateUser(true);
       setCurrentUser(username);
     } else {
-      alert("Error occurred while attempting to log in");
+      alert("Error occurred while attempting to  log in");
     }
   };
   //Sign up data
@@ -56,6 +62,7 @@ export default function LoginScreen() {
   const [verifyPass, updateVerifyPass] = useState("");
   const [signupPhone, updateSignupPhone] = useState("");
   const submitForm = async () => {
+    try {
     const dataPush = await fetch("https://square-scan.onrender.com/signup", {
       method: "POST",
       headers: {
@@ -63,13 +70,17 @@ export default function LoginScreen() {
       },
       body: JSON.stringify({ email: signupEmail, password: signupPass }),
     });
-    const { success, message } = await dataPush.json();
+    const { success, message} = await dataPush.json();
     if (success) {
       alert(message);
       updateSignupVisible(false);
     } else {
       alert(message);
     }
+  }
+  catch (e) {
+    console.log("Error in log in post frontend side: ",e)
+  }
   };
   return (
     <SafeAreaView style={styles.container}>
