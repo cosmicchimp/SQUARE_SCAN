@@ -11,8 +11,9 @@ export function generateAccessToken(user) {
       { expiresIn: '15m' }                  
     );
   }
-export async function generateRefreshToken(user) {
+export async function generateRefreshToken(email) {
     try {
+        const user = await sql`SELECT * FROM userbase.users WHERE users.email = ${email}`
         console.log('user param in side gen token: ', user)
         const refToken = jwt.sign(
           { user_id: user.user_id, email: user.email },
