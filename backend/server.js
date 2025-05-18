@@ -9,7 +9,7 @@ import s3PutRoute from "./aws/s3PushObject.js";
 import checkUser from "./middleware/finduser.js"
 import { generateAccessToken, generateRefreshToken } from "./jwt/gentoken.js";
 import checkRefreshToken from "./jwt/checkrefreshtoken.js";
-import checkAccessToken from "./jwt/checkrefreshtoken.js";
+import checkAccessToken from "./jwt/checkAccesstoken.js";
 import signUpUser from "./middleware/signupuser.js";
 const app = express();
 dotenv.config();
@@ -37,7 +37,7 @@ app.post("/login", async (req, res) => {
   if (isValid) { //basic login user check
     const hasRefreshToken = checkRefreshToken(email) 
     if (!hasRefreshToken) {
-      generateRefreshToken(email)
+      await generateRefreshToken(email)
     }
     console.log(`User '${email}' is logged in!`);
     const accessToken = generateAccessToken(email)
