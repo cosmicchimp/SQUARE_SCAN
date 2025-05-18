@@ -42,7 +42,7 @@ app.post("/login", async (req, res) => {
     console.log(`User '${email}' is logged in!`);
     const accessToken = generateAccessToken(email)
     res.json({ success: true, message: "Login successful", accessToken:accessToken });
-    console.log("Access Token: ",accessToken);
+    console.log("Access Token: ", accessToken);
   } else {
     console.log("Log in denied");
     res.json({ success: false, message: "Login failed" });

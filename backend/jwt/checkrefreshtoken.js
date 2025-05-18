@@ -8,7 +8,7 @@ const sql = neon(process.env.DATABASE_URL)
 export default async function checkRefreshToken(email) {
     try {
         const user = await sql`SELECT * FROM users WHERE email = ${email}`
-        const result = await sql`SELECT * FROM user_tokens WHERE user_tokens.user_id = (SELECT user_id from users WHERE users.email = ${email})`
+        const result = await sql`SELECT * FROM user_tokens WHERE user_tokens.user_id = (SELECT user_id from users WHERE users.email = ${email}) AND user_tokens.expires_at > NOW()`
         if (result.length > 0) {
             return true
         }
