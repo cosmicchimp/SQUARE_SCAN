@@ -1,8 +1,11 @@
+import 'react-native-gesture-handler'; // must be first
 import { StyleSheet } from "react-native";
 import { useFonts } from "expo-font";
 import RootNavigator from "./navigation/RootNavigator";
 import { AuthProvider } from "./context/AuthContext";
-import { useContext } from "react";
+import { enableScreens } from 'react-native-screens';
+enableScreens();
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     "Quicksand-Regular": require("./assets/fonts/LilitaOne-Regular.ttf"),
@@ -18,16 +21,7 @@ export default function App() {
   }
   return (
     <AuthProvider>
-      <RootNavigator />
+      <RootNavigator/>
     </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

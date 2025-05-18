@@ -15,6 +15,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { HomeModernIcon, UserIcon, Squares2X2Icon, } from "react-native-heroicons/solid";
 import { HomeModernIcon as HomeModernIconOutline, UserIcon as UserIconOutline, Squares2X2Icon as Squares2X2IconOutline, } from "react-native-heroicons/outline";
 
+const PURPLE_COLOR = "#673AB7"
 const Tab = createBottomTabNavigator();
 
 const screens = [
@@ -44,12 +45,10 @@ const Navigator = ({navigation, route}) => {
   const getIcon = (focused, expanded, icons) => {
     const IconComponent = focused ? icons.solid : icons.outline;
     const color = expanded
-      ? (focused ? "#ffffff" : "rgba(255,255,255,0.5)")
-      : (focused ? "#673AB7" : "#000000");
+      ? (focused ? PURPLE_COLOR : PURPLE_COLOR)
+      : (focused ? PURPLE_COLOR : "#000");
     return <IconComponent size={34} color={color} />;
   };
-
-    
 
   const onPressEdit = () => {
     setIsEditMode(!isEditMode);
@@ -61,27 +60,26 @@ const Navigator = ({navigation, route}) => {
     return tabState?.index ?? 1;
   });
 
-
   return (
     <>
-    <StatusBar barStyle={(tabIndex === 1) ? "light-content" : "dark-content"} />
+    <StatusBar barStyle={(tabIndex === 1) ? "dark-content" : "dark-content"} />
     <Tab.Navigator
       initialRouteName="Square Scan"
       screenOptions={{
         tabBarStyle: expanded ? styles.purpleTabStyle : styles.whiteTabStyle,
         headerShadowVisible: (!(tabIndex === 1)) ? true : false,
         headerStyle: { 
-          backgroundColor: (tabIndex === 1) ? "#673AB7" : "#FFFFFF",
+          backgroundColor: (tabIndex === 1) ? "#fff" : "#FFFFFF",
           height: 100,
+          borderBottomColor:  PURPLE_COLOR,
         },
         headerTitleStyle: 
         {
-          color: (tabIndex === 1) ? "#FFF" : "#000",
+          color: (tabIndex === 1) ? PURPLE_COLOR : "#000",
           fontFamily: "AppleTea", 
-          fontSize: 23,
+          fontSize: (tabIndex === 1) ? 26 : 23,
         },
         headerTitleAlign: (tabIndex === 1) ? "center" : "left",
-
       }}
     >
       {screens.map(({ name, component, icons, title }) => (
@@ -111,6 +109,8 @@ const styles = StyleSheet.create({
     fontFamily: "Lill-Lill",
     height: 80,
     flexDirection: "row",
+        backgroundColor: "#fff",
+    borderTopColor: PURPLE_COLOR,
     backgroundColor: "rgba(255, 255, 255, 0.89)",
     alignItems: "center",
   },
@@ -118,8 +118,10 @@ const styles = StyleSheet.create({
     fontFamily: "Lill-Lill",
     height: 80,
     flexDirection: "row",
-    backgroundColor: "#673AB7",
-    borderTopColor: "#673AB7",
+    backgroundColor: "#fff",
+    borderTopColor: "#fff",
+    // backgroundColor: "#673AB7",
+    // borderTopColor: "#673AB7",
     alignItems: "center",
   },
   iconContainer: {

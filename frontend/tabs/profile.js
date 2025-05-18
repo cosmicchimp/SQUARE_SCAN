@@ -22,7 +22,6 @@ import Theme from "../components/profile_components/Theme";
 import Language from "../components/profile_components/Language";
 import Support from "../components/profile_components/Support";
 import Review from "../components/profile_components/Review";
-import s3PutObject from "../components/profile_components/s3PutObject"
 export default function Profile() {
   const { AuthenticateUser } = useContext(AuthContext);
   const [profileInfoVisible, updateProfileInfoVisible] = useState(false);
