@@ -1,7 +1,7 @@
 import passport from 'passport'
 import dotenv from 'dotenv'
 import { neon } from "@neondatabase/serverless";
-import { generateAccessToken, generateRefreshToken } from "./jwt/gentoken.js";
+import { generateAccessToken, generateRefreshToken } from "../jwt/gentoken.js";
 import checkAccessToken from "./checkaccesstoken.js"
 import genToken from "./gentoken.js"
 const sql = neon(process.env.DATABASE_URL)
