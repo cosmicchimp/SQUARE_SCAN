@@ -21,7 +21,7 @@ export default function LoginScreen() {
   const { AuthenticateUser, isAuthenticated, setCurrentUser } =
     useContext(AuthContext);
   const getToken = async () => {
-    return await SecureStore.getItemAsync('jwt');
+    return await SecureStore.getItemAsync('accessToken');
       };
   // Trigger the slide animation when signupVisible changes
   useEffect(() => {

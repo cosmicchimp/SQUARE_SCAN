@@ -2,8 +2,7 @@ async function s3PutObject(formData) {
     try {
         await fetch("https://square-scan.onrender.com/s3PutObject", {
             method:"POST",
-            headers: { "Content-Type": "application/json" },
-            body:JSON.stringify({formData})
+            body:formData
         })
     }
     catch (e) {
