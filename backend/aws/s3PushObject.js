@@ -8,9 +8,9 @@ router.post("/s3PutObject", async (req, res) => {
     console.log(formData)
     const params = {
         Bucket:"squarescantestbuckduckula",
-        Key:formData.itemKey || 123, 
-        Body:formData.testText,
-        ContentType:"text/plain"
+        Key:formData.get("itemKey"),
+        Body:formData.get("photo"),
+        ContentType:formData.get("photo").type
     }
     try {
         await s3.send(new PutObjectCommand(params))
