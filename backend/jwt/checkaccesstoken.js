@@ -1,6 +1,6 @@
 import passport from 'passport'
 import dotenv from 'dotenv'
-import checkUser from "../middleware/finduser"
+import checkUser from "../middleware/finduser.js"
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 const params = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

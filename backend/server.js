@@ -8,6 +8,8 @@ import path from 'path'
 import s3PutRoute from "./aws/s3PushObject.js";
 import checkUser from "./middleware/finduser.js"
 import { generateAccessToken, generateRefreshToken } from "./jwt/gentoken.js";
+import checkRefreshToken from "./jwt/checkrefreshtoken.js";
+import signUpUser from "./middleware/signupuser.js";
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 4000;
@@ -15,64 +17,6 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(express.json());
 app.use(cors());
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const validsymbols = ["!","@","#","$","%","^","&","*"]
-//Helper functions to validate and sanitize the users emails on signup
-// Load the disposable email domains into a Set for efficient lookup
-const disposableDomains = new Set(
-  fs.readFileSync(path.join(__dirname, 'data/disposable_email_blocklist.conf'), 'utf-8')
-    .split('\n')
-    .map(domain => domain.trim().toLowerCase())
-    .filter(Boolean)
-);
-function isValidEmailFormat(email) {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-  return regex.test(email); 
-}
-function symbolCheck(password) {
-  let valid = false
-  validsymbols.forEach((symbol) => {
-    if (password.includes(symbol)) {
-      valid = true
-    }
-  }) 
-  return valid
-}
-function isPasswordValid(password, verifypassword) {
-if (password.length < 9 || !symbolCheck(password) ||  password !== verifypassword) {
-  return false
-}
-else {
-  return true
-}
-}
-function isAllowedEmail(email) {
-  if (!isValidEmailFormat(email)) return false;
-  const domain = email.split('@')[1].toLowerCase();
-  return !disposableDomains.has(domain);
-}
-
-const signUpUser = async (email, password, verifypassword) => {
-  try {
-    console.log(`pass, verify pass: ${password} ${verifypassword}`)
-    //testing the email validity before running the user account creation
-    if (!isAllowedEmail(email) || !isPasswordValid(password, verifypassword)) {    
-      return false
-    }
-    else {
-    const encryptedpass = await bcrypt.hash(password, 10); // Make sure to await bcrypt.hash
-      await sql`
-        INSERT INTO userbase.users(email, password, created_at) 
-        VALUES (${email}, ${encryptedpass}, NOW())
-      `;
-      console.log("User created");
-      return true; // Return a result indicating success}
-    }
-  } catch (e) {
-    console.log("Error: " + e);
-    return false; // Return false in case of an error
-  }
-
-}
 // Basic route for testing
 app.get("/", async (req, res) => {
   try {
@@ -83,28 +27,37 @@ app.get("/", async (req, res) => {
     res.status(500).send("Error fetching database version.");
   }
 });
-
-app.listen(port, "0.0.0.0", () => {
-  console.log("Server running on port" + port);
-});
-
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {const { email, password } = req.body;
   console.log(
     `User (${email}) attemped to log in using password (${password})`
   );
   const isValid = await checkUser({email:email, password:password});
-  if (isValid) {
+  if (isValid) { //basic login user check
+    const hasRefreshToken = checkRefreshToken(email) 
+    if (!hasRefreshToken) {
+      await generateRefreshToken(email)
+    }
     console.log(`User '${email}' is logged in!`);
-    res.json({ success: true, message: "Login successful"});
+    const accessToken = generateAccessToken(email)
+    res.json({ success: true, message: "Login successful", accessToken:accessToken });
+    console.log("Access Token: ", accessToken);
   } else {
     console.log("Log in denied");
     res.json({ success: false, message: "Login failed" });
+  }}
+  catch (e) {
+    console.log("Error in log in route: ", e)
   }
+  
 });
-
+app.post("/gat", async (req, res) => {
+  const {email} = req.body
+  return generateAccessToken(email)
+})
 app.post("/signup", async (req, res) => {
   const { email, password, verifypassword} = req.body;
+
   const signup = await signUpUser(email, password, verifypassword); // Now this will work as expected
 
   if (signup) {
@@ -227,3 +180,6 @@ app.post("/deleteproject", async (req,res) => {
   }
 })
 app.post("/s3PutObject", s3PutRoute)
+app.listen(port, "0.0.0.0", () => {
+  console.log("Server running on port" + port);
+});

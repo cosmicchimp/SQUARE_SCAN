@@ -22,7 +22,6 @@ import Theme from "../components/profile_components/Theme";
 import Language from "../components/profile_components/Language";
 import Support from "../components/profile_components/Support";
 import Review from "../components/profile_components/Review";
-
 export default function Profile() {
   const { AuthenticateUser } = useContext(AuthContext);
   const [profileInfoVisible, updateProfileInfoVisible] = useState(false);
@@ -198,6 +197,7 @@ export default function Profile() {
               <Text style={styles.text}>Log out</Text>
               <FontAwesome6 name="door-open" size={24} color={iconColor} />
             </TouchableOpacity>
+    
           </View>
         </ScrollView>
       </View>

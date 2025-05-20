@@ -19,7 +19,9 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "web": {
-    }
+    "web": {},
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
