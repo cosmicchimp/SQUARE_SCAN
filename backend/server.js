@@ -35,8 +35,9 @@ app.post("/login", async (req, res) => {
   const isValid = await checkUser({email:email, password:password});
   if (isValid) { //basic login user check
     let hasRefreshToken = await checkRefreshToken(email) 
-    hasRefreshToken ? null : await generateRefreshToken(email)
-    console.log(`User '${email}' is logged in!`);
+    hasRefreshToken ? console.log('User has refresh token'): await generateRefreshToken(email)
+    !hasRefreshToken ? console.log('User does not have refresh token'): null;
+    console.log(`User '${email}' is logged in!`); 
     const accessToken = await generateAccessToken(email)
     res.json({ success: true, message: "Login successful", accessToken:accessToken });
     console.log("Access Token: ", accessToken);
