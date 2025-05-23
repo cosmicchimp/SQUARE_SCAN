@@ -27,11 +27,11 @@ export async function generateRefreshToken(email) {
           { expiresIn: '30d' }
         );
 
-        const insert = await sql`INSERT INTO userbase.user_tokens (user_id, token_hash, expires_at)
+        const insert = await sql`INSERT INTO userbase.user_tokens (user_id, user_refresh_token, expires_at)
         VALUES (${user.user_id}, ${refToken}, NOW() + INTERVAL '30 days')
         ON CONFLICT (user_id)
         DO UPDATE SET
-        token_hash = EXCLUDED.token_hash,
+        user_refresh_token = EXCLUDED.user_refresh_token,
         expires_at = EXCLUDED.expires_at;`;
 
         console.log('Insert result:', insert);
