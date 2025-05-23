@@ -29,9 +29,6 @@ app.get("/", async (req, res) => {
 });
 app.post("/login", async (req, res) => {
   try {const { email, password } = req.body;
-  console.log(
-    `User (${email}) attemped to log in using password (${password})`
-  );
   const isValid = await checkUser({email:email, password:password});
   if (isValid) { //basic login user check
     let hasRefreshToken = await checkRefreshToken(email) 
@@ -40,7 +37,6 @@ app.post("/login", async (req, res) => {
     console.log(`User '${email}' is logged in!`); 
     const accessToken = await generateAccessToken(email)
     res.json({ success: true, message: "Login successful", accessToken:accessToken });
-    console.log("Access Token: ", accessToken);
   } else {
     console.log("Log in denied");
     res.json({ success: false, message: "Login failed" });
