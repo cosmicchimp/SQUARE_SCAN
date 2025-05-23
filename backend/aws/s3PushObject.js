@@ -19,7 +19,6 @@ router.post("/s3PutObject", async (req, res) => {
     catch (e) {
         console.log("Error in the s3 put object functions", e)
         res.status(500).json({success:false})
-
     }
 })
 export default router

@@ -18,29 +18,24 @@ export function generateAccessToken(user) {
 
 export async function generateRefreshToken(email) {
     try {
-        const [user] = await sql`SELECT * FROM userbase.users WHERE users.email = ${email}`;
-        if (!user) {
-            console.log("No user found with email:", email);
-            return { success: false, error: "User not found" };
-        }
-        console.log('User found:', user);
+        const user = await sql`SELECT * FROM userbase.users WHERE users.email = ${email}`;
+        console.log(user)
+        // const refToken = jwt.sign(
+        //   { user_id: user.user_id, email: user.email },
+        //   REFRESH_TOKEN_SECRET,
+        //   { expiresIn: '30d' }
+        // );
 
-        const refToken = jwt.sign(
-          { user_id: user.user_id, email: user.email },
-          REFRESH_TOKEN_SECRET,
-          { expiresIn: '30d' }
-        );
+        // const insert = await sql`INSERT INTO user_tokens (user_id, token_hash, expires_at)
+        // VALUES (${user.user_id}, ${refToken}, NOW() + INTERVAL '30 days')
+        // ON CONFLICT (user_id)
+        // DO UPDATE SET
+        // token_hash = EXCLUDED.token_hash,
+        // expires_at = EXCLUDED.expires_at;`;
 
-        const insert = await sql`INSERT INTO user_tokens (user_id, token_hash, expires_at)
-        VALUES (${user.user_id}, ${refToken}, NOW() + INTERVAL '30 days')
-        ON CONFLICT (user_id)
-        DO UPDATE SET
-        token_hash = EXCLUDED.token_hash,
-        expires_at = EXCLUDED.expires_at;`;
+        // console.log('Insert result:', insert);
 
-        console.log('Insert result:', insert);
-
-        return { success: true }
+        // return { success: true }
     }
     catch (e) {
         console.log("Error in refresh gen token: ", e);
