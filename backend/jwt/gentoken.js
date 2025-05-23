@@ -8,7 +8,7 @@ const sql = neon(process.env.DATABASE_URL)
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-export function generateAccessToken(user) {
+export async function generateAccessToken(user) {
     return jwt.sign(
       { user_id: user.user_id, email: user.email },   
       ACCESS_TOKEN_SECRET,

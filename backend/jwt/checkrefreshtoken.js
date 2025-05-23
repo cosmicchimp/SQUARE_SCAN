@@ -6,8 +6,8 @@ export default async function checkRefreshToken(email) {
     try {
         const user = await sql`SELECT * FROM userbase.users WHERE email = ${email}`
         const result = await sql`SELECT * FROM userbase.user_tokens WHERE user_tokens.user_id = (SELECT user_id from userbase.users WHERE users.email = ${email}) AND user_tokens.expires_at > NOW()`
-        console.log(result, result.length)
-        if (result.length > 0) {
+        console.log(user, result, result.length)
+        if (result.length !== 0) {
             return true
         }
         else {
