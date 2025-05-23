@@ -1,8 +1,9 @@
 import { BlurView } from 'expo-blur';
-import React, { useEffect, useState, } from 'react';
-import {ImageBackground, Text, View, Image, Dimensions, Animated as NormalAnimated, TouchableOpacity, LayoutAnimation } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import {ImageBackground, View, Dimensions, TouchableOpacity, LayoutAnimation } from 'react-native';
 import { FlatList, GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { runOnJS, withSpring, clamp, withSequence, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming, withRepeat,FadeIn, FadeOut, LinearTransition, Easing } from 'react-native-reanimated';
+import { CarouselContext } from "../../context/CarouselContext";
 import * as Haptics from 'expo-haptics';
 import { Octicons } from '@expo/vector-icons';
 
@@ -12,24 +13,23 @@ const _itemSize = width * 0.25;
 const _spacing = 15;
 const _headerHeight = 100;
 
-const DELETE_BUTTON_SIZE = 24; 
-const PURPLE_COLOR = '#9C27B0'
+const _deleteButtonSize = 24; 
+const _purpleColor = '#9C27B0'
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
-
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMode, onToggleEditMode, onDeleteAnimationComplete}) {
   const dragX = useSharedValue(0);
   const dragY = useSharedValue(0);
-  const isDragging = useSharedValue(false);
   const itemOpacity = useSharedValue(0);
   const jigglePhase = useSharedValue(0);
   const isMarkedForDeletion = useSharedValue(false); 
   const exitScale = useSharedValue(1); // For delete exit animation
   const exitOpacity = useSharedValue(1); 
-
+  const {isDragging, setIsDragging} = useContext(CarouselContext);
+  
   // start/stop jiggle animation based on edit mode
    useEffect(() => {
     if (isEditMode) {
@@ -54,12 +54,12 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
 
   const panGesture = Gesture.Pan()
     .activateAfterLongPress(500)
-    .activeOffsetX([-100, 100]) 
-    .activeOffsetY([-100, 100]) 
+    // .activeOffsetX([-100, 100]) 
+    // .activeOffsetY([-100, 100]) 
     .onStart(() => {
       'worklet';
       runOnJS(triggerHapticFeedback)();
-      isDragging.value = true;
+      runOnJS(setIsDragging)(true);
 
       // add overlay
       itemOpacity.value = withTiming(0.3, { duration: 500 });
@@ -72,8 +72,8 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
     })
     .onEnd(() => {
       'worklet';
-      isDragging.value = false;
-
+      runOnJS(setIsDragging)(false);
+      
       // Enter edit mode on long press start
       runOnJS(onToggleEditMode)(true);
 
@@ -81,8 +81,8 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
       itemOpacity.value = withTiming(0, { duration: 500 });
 
       // return item
-      dragX.value = withSpring(0, { damping: 25, stiffness: 400 });
-      dragY.value = withSpring(0, { damping: 25, stiffness: 400 });
+      dragX.value = withSpring(0, { damping: 15, stiffness: 200 });
+      dragY.value = withSpring(0, { damping: 15, stiffness: 200 });
 
     });
 
@@ -92,8 +92,8 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
     isMarkedForDeletion.value = true; // Signal to start exit animation
 
     // Start the exit animation values
-    exitScale.value = withTiming(0, { duration: 300 });
-    exitOpacity.value = withTiming(0, { duration: 300 }, (finished) => {
+    exitScale.value = withTiming(0, { duration: 200 });
+    exitOpacity.value = withTiming(0, { duration: 200 }, (finished) => {
         // Callback after opacity animation finishes
         if (finished) {
             runOnJS(onDeleteAnimationComplete)(item); // Notify parent to remove item by id
@@ -154,13 +154,13 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
 
         return {
             borderWidth: withSpring(currentBorderWidth),
-            borderColor: isDragging.value ? '#fff' : (isEditMode ? PURPLE_COLOR : scrollDrivenBorderColor), // White border when dragging, Purple in edit mode
+            borderColor: isDragging.value ? '#fff' : (isEditMode ? _purpleColor : scrollDrivenBorderColor), // White border when dragging, Purple in edit mode
             transform: [
                 { translateY: scrollDrivenTranslateY },
                 { translateX: dragX.value },
                 { translateY: dragY.value },
                 { scale: withSpring(currentScale) },
-                { rotateZ: `${rotateZ}deg` }, //  jiggle anim
+                // { rotateZ: `${rotateZ}deg` }, //  jiggle anim
             ],
             // Elevate the item when dragging or editing
             zIndex: isDragging.value || isEditMode ? 100 : 0,
@@ -183,7 +183,7 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
           },
           finalItemStyle,
         ]}
-        Layout={LinearTransition.easing(Easing.ease).duration(300)}
+        // Layout={LinearTransition.easing(Easing.ease).duration(800)}
       >
           <ImageBackground
             source={{ uri: imageUri }}
@@ -208,12 +208,12 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
                       position: 'absolute',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      width: DELETE_BUTTON_SIZE,
-                      height: DELETE_BUTTON_SIZE,
-                      borderRadius: DELETE_BUTTON_SIZE / 2,
-                      backgroundColor: PURPLE_COLOR,
-                      top: -DELETE_BUTTON_SIZE / 3, // Position near the top-right corner
-                      right: -DELETE_BUTTON_SIZE / 3,
+                      width: _deleteButtonSize,
+                      height: _deleteButtonSize,
+                      borderRadius: _deleteButtonSize / 2,
+                      backgroundColor: _purpleColor,
+                      top: -_deleteButtonSize / 3, // Position near the top-right corner
+                      right: -_deleteButtonSize / 3,
                       zIndex: 101, // Ensure button is above the item
                     },
                     deleteButtonAnimatedStyle, // Animate appearance
@@ -221,7 +221,7 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
                 onPress={runOnJS(handleDeletePress)} // Run handleDeletePress on the UI thread
                 // pointerEvents is controlled by deleteButtonAnimatedStyle
             >
-                <Octicons name="x" size={DELETE_BUTTON_SIZE * 0.6} color="white" />
+                <Octicons name="x" size={_deleteButtonSize * 0.6} color="white" />
             </AnimatedTouchableOpacity>
 
         </ImageBackground>
@@ -230,7 +230,9 @@ function CarouselItem({ imageUri, item, index, scrollX, isEditMode, setIsEditMod
   );
 }
 
-export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEditMode, setIsEditMode }) {
+export function CircularSlider({ orientation, isEditMode, setIsEditMode }) {
+
+  const { photos, deletePhoto, scrollX } = useContext(CarouselContext);
 
   // const scrollX = useSharedValue(0);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -281,23 +283,10 @@ export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEdit
       // }
   };
 
-  // Function to handle item deletion AFTER its exit animation
-  const handleDeleteAnimationComplete = (uriToDelete) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPhotos(prevPhotos => {
-      const newPhotos = prevPhotos.filter(uri => uri !== uriToDelete);
-
-      // Exit edit mode if list becomes empty after deletion
-      if (newPhotos.length === 0 && isEditMode) setIsEditMode(false);
-      
-      return newPhotos;
-    });
-  };
-
   // height: height * 1.61, width: '100%',
   return (
     <View style={{ flex: 1 }}>
-      <BlurView intensity={20} tint="light" style={{ position: 'absolute', top: -200, left: -100, right: -100, bottom: -100, }} />
+      <BlurView intensity={100} tint="dark" style={{ position: 'absolute', top: -200, left: -100, right: -100, bottom: -100, }} />
 
       {photos.length > 0 &&
         (
@@ -306,7 +295,7 @@ export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEdit
               animatedStyle,
               {
                 position: 'absolute',
-                top: "28%",
+                top: "35%",
                 height: `${26}%`,
                 backgroundColor: "transparent",
                 borderRadius: 0
@@ -349,7 +338,7 @@ export function CircularSlider({ photos, setPhotos, scrollX, orientation, isEdit
                 scrollX={scrollX}
                 isEditMode={isEditMode}
                 onToggleEditMode={handleToggleEditMode} 
-                onDeleteAnimationComplete={handleDeleteAnimationComplete}      
+                onDeleteAnimationComplete={deletePhoto}      
               />
             );
           }}

@@ -66,7 +66,7 @@ const Navigator = ({navigation, route}) => {
     <Tab.Navigator
       initialRouteName="Square Scan"
       screenOptions={{
-        tabBarStyle: expanded ? styles.purpleTabStyle : styles.whiteTabStyle,
+        tabBarStyle: expanded ? styles.whiteTabStyle : styles.whiteTabStyle,
         headerShadowVisible: (!(tabIndex === 1)) ? true : false,
         headerStyle: { 
           backgroundColor: (tabIndex === 1) ? "#fff" : "#FFFFFF",
@@ -79,6 +79,7 @@ const Navigator = ({navigation, route}) => {
           fontFamily: "AppleTea", 
           fontSize: (tabIndex === 1) ? 26 : 23,
         },
+
         headerTitleAlign: (tabIndex === 1) ? "center" : "left",
       }}
     >
@@ -109,19 +110,20 @@ const styles = StyleSheet.create({
     fontFamily: "Lill-Lill",
     height: 80,
     flexDirection: "row",
-        backgroundColor: "#fff",
+    backgroundColor: "#fff",
     borderTopColor: PURPLE_COLOR,
     backgroundColor: "rgba(255, 255, 255, 0.89)",
     alignItems: "center",
   },
   purpleTabStyle: {
     fontFamily: "Lill-Lill",
+
     height: 80,
     flexDirection: "row",
-    backgroundColor: "#fff",
-    borderTopColor: "#fff",
-    // backgroundColor: "#673AB7",
-    // borderTopColor: "#673AB7",
+    // backgroundColor: "#fff",
+    // borderTopColor: "#fff",
+    backgroundColor: "#673AB7",
+    borderTopColor: "#673AB7",
     alignItems: "center",
   },
   iconContainer: {

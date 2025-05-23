@@ -92,7 +92,6 @@ export default function HomeScreen() {
   });
 
   return (
-    
     <View style={{flex: 1, backgroundColor: ""}}>
       <Animated.View style={[styles.newProjectButtonContainer, animatedContainerStyle]}>
         <TouchableOpacity onPress={animateButton} activeOpacity={0.9}>

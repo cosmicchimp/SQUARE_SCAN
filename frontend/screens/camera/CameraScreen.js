@@ -8,39 +8,49 @@ import Octicons from '@expo/vector-icons/Octicons';
 import FlashingIcon from './overlays/FlashingRotate';
 import { useDeviceOrientation } from './hooks/useDeviceOrientation';
 import { AnimationContext } from "../../context/AnimationContext";
+import { CarouselContext } from "../../context/CarouselContext";
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { PhotoIcon, PaperAirplaneIcon, XMarkIcon } from "react-native-heroicons/solid";
+import { PhotoIcon, PaperAirplaneIcon } from "react-native-heroicons/solid";
 import { CircularSlider } from '../../components/camera_components/CircularSlider';
 import Animated, { withTiming, withSpring,interpolate, useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import Feather from '@expo/vector-icons/Feather';
 
 const {width} = Dimensions.get("screen");
 const _itemSize = width * 0.25;
+const _deleteColorTransparent = "rgba(255,80,80,0.35)";
+const _deleteColor= "rgba(255,80,80,1)";
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 const CameraScreen = () => {
   const navigation = useNavigation();
   const orientation = useDeviceOrientation();
-  const { setExpanded } = useContext(AnimationContext);
   const cameraRef = useRef(null); useEffect(() => { return () => { cameraRef.current = null; };}, []);
-  const isFocused = useIsFocused(); // is camera focused
+  const isFocused = useIsFocused(); // for: is camera focused
 
   //////////////////
-  const [photos, setPhotos] = useState([]);
+  const { setExpanded } = useContext(AnimationContext);
+  const { photos, setPhotos, deletePhoto, isEditMode, setIsEditMode, scrollX, } = useContext(CarouselContext);
+
+  //////////////////
+
   const [isCapturing, setIsCapturing] = useState(false);
 
   // Photo taking logic
   const takePhoto = async () => {
     if (isCapturing || !cameraRef.current) return;
-      try {
+    try {
+      if(isLandscape){
         setIsCapturing(true);
         const photo = await cameraRef.current.takePictureAsync({ skipProcessing: false });
         console.log("Photo taken:", photo.uri);
         setPhotos(prev => [...prev, photo.uri]);
-      } catch (err) {
-        console.warn("Capture failed:", err);
-      } finally {
-        setIsCapturing(false);
       }
+    } catch (err) {
+      console.warn("Capture failed:", err);
+    } finally {
+      setIsCapturing(false);
+    }
   };
 
   /////////////////
@@ -90,15 +100,16 @@ const CameraScreen = () => {
   // shared values
   const uiOpacityShared = useSharedValue(1); // For general UI elements based on orientation
   const carouselToggleShared = useSharedValue(0); // 0 for carousel closed, 1 for carousel open
-  const sliderScrollX = useSharedValue(0); // the value of the current index as a float from 0.0 to length
   const headerIconsAnimation = useSharedValue(0); // 0 for default icons, 1 for carousel-visible icons
 
   //////////////////
   // UI opacity animation
    useEffect(() => {
-    const targetOpacity = (isLandscape && !isCarouselVisible) ? 0 : 1;
-    uiOpacityShared.value = withSpring(targetOpacity, { duration: 300 });
-  }, [isLandscape]);
+    if (!isCapturing){
+      const targetOpacity = (isLandscape && !isCarouselVisible) ? 0 : 1;
+      uiOpacityShared.value = withSpring(targetOpacity, { duration: 300 });
+    }
+  }, [isLandscape, isCapturing]);
 
   /////////////////
   // Carosuel toggle animation
@@ -153,12 +164,12 @@ const CameraScreen = () => {
   const closeButtonStyle = useAnimatedStyle(() => {
       return {
         opacity: interpolate(
-          sliderScrollX.value, [0, 0.5, 1], [1, 0.2, 0]
+          scrollX.value, [0, 0.5, 1], [1, 0.2, 0]
         ),
         transform: [
           {
             scale: Math.max(0.3, Math.min(1.25, interpolate(
-              sliderScrollX.value,
+              scrollX.value,
               [0, 0.5, 1],
               [1, 0.3, 0]
             )
@@ -195,8 +206,25 @@ const CameraScreen = () => {
     };
   });
 
+   const photoButtonAnimatedStyle = useAnimatedStyle(() => {
+    const animationDuration = 200; 
+    return {
+      borderColor: withTiming(isCapturing ? "#ddd" : '#fff', { duration: animationDuration }),
+      borderWidth: withTiming(isCapturing ? 2 : 5, { duration: animationDuration }),
+    };
+  });
+
+  const innerViewAnimatedStyle = useAnimatedStyle(() => {
+    const animationDuration = 100; 
+    return {
+      width: withTiming(isCapturing ? 60 : 50, { duration: animationDuration }),
+      height: withTiming(isCapturing ? 60 : 50, { duration: animationDuration }),
+      borderRadius: withTiming(30, { duration: animationDuration }),
+      backgroundColor: withTiming(isCapturing ? "#ddd" : '#fff', { duration: animationDuration }),
+    };
+  });
+
   const [scrollEnabled, setScrollEnabled] = useState(true);
-  const [isEditMode, setIsEditMode] = useState(false);
 
   /////////////////
   //Request Permissions
@@ -278,9 +306,7 @@ const CameraScreen = () => {
           </View>
         )}
 
-        
-
-
+      
         {/* main footer */}
         <Animated.View style={[styles.footerContainer2, UIAnimatedStyle]}>
           <BlurView intensity={0} tint="light" style={StyleSheet.absoluteFill} />
@@ -290,9 +316,6 @@ const CameraScreen = () => {
             styles.carouselContainerStyle, carouselContainerAnimatedStyle
           ]}>
               <CircularSlider 
-                photos={photos}
-                setPhotos={setPhotos} 
-                scrollX={sliderScrollX}
                 scrollEnabled={scrollEnabled}
                 setScrollEnabled={setScrollEnabled}
                 orientation={orientation}   
@@ -307,7 +330,7 @@ const CameraScreen = () => {
             {/* images button */}
             <Animated.View style={[closeButtonStyle, { pointerEvents:"auto "}]}>
               <TouchableOpacity
-                style={[styles.footerButton, { backgroundColor: isCarouselVisible ? "rgba(255,80,80,0.35)" : "rgba(255,255,255,0.2)", maxHeight:_itemSize, maxWidth:_itemSize, }]}
+                style={[styles.footerButton, { backgroundColor: isCarouselVisible ? _deleteColorTransparent : "rgba(255,255,255,0.2)", maxHeight:_itemSize, maxWidth:_itemSize, }]}
                 onPress={toggleCarousel}
               >
                 {isCarouselVisible ? <Octicons name="x" size={28} color="#fff" /> : <PhotoIcon size={28} color={"#fff"} />}
@@ -325,9 +348,9 @@ const CameraScreen = () => {
               [sendButtonAnimatedStyle,]
             }>
               <TouchableOpacity
-                style={[styles.footerButton, { backgroundColor: "rgba(160,32,240,0.8)" }]}
+                style={[styles.footerButton, { backgroundColor: (photos.length <= 0) ? "rgba(160,32,240,0.5)" : "rgba(160,32,240,0.8)" }]}
                 onPress={toggleCarousel}
-                disabled={isCarouselVisible}
+                disabled={(photos.length <= 0)}
               >
                 <PaperAirplaneIcon size={28} color={"#fff"} />
               </TouchableOpacity>
@@ -343,9 +366,8 @@ const CameraScreen = () => {
             <TouchableOpacity
                 style={styles.headerButton}
                 onPress={() => {
-                    if (isCarouselVisible) {
-                        console.log("Trash Action Triggered"); // TODO: Implement actual trash action
-                    } else {
+                    if (isCarouselVisible) deletePhoto(); // delete 
+                    else {
                         console.log("Help Action Triggered"); // TODO: Implement actual help action
                     }
                 }}
@@ -354,7 +376,7 @@ const CameraScreen = () => {
                     <Octicons name="question" size={24} color="#fff" />
                 </Animated.View>
                 <Animated.View style={[styles.headerButton, trashIconStyle, {display: isCarouselVisible ? 'flex': "none"}]}>
-                    <Feather name="trash-2" size={24} color="red" />
+                    <Feather name="trash-2" size={24} color={_deleteColor} />
                 </Animated.View>
             </TouchableOpacity>
 
@@ -401,10 +423,10 @@ const CameraScreen = () => {
         </Animated.View>
 
         {/* photo button */}
-        <Animated.View style={[oppositeUIAnimatedStyle, {flex: 1 }]}>
-          <TouchableOpacity onPress={takePhoto} style={styles.photoButton} disabled={isCarouselVisible}>
-            <View style={{width: 50, height: 50, borderRadius: 30, backgroundColor: '#fff',}}/>
-          </TouchableOpacity>
+        <Animated.View style={[oppositeUIAnimatedStyle, { flex: 1 }]}>
+          <AnimatedTouchableOpacity disabled={isCapturing} onPress={takePhoto} style={[styles.photoButton, photoButtonAnimatedStyle]} >
+            <Animated.View style={innerViewAnimatedStyle} />
+          </AnimatedTouchableOpacity>
         </Animated.View>
 
         {/* info  */}
